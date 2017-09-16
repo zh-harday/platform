@@ -117,29 +117,6 @@ const actions = {
                             message: '登录成功',
                             type: 'success'
                         });
-                        // userPwd.self.$http.post('api/user/findResourceByUid', { //请求用户权限列表数据
-                        //     "um_id": state.merchants[0].um_id //用户、机构中间id
-                        // }).then(Response => {
-                        //     state.menus = Response.data.result;
-                        //     console.log(state.menus);
-                        //     if (Response.data.status == '200') {
-                        //         // alert(1);
-                        //         userPwd.self.$router.push({
-                        //             name: 'homeContent'
-                        //         });
-                        //         commit('Notification', {
-                        //             title: '',
-                        //             message: '登录成功',
-                        //             type: 'success'
-                        //         });
-                        //     }
-                        // }).catch(error => {
-                        //     commit('Notification', {
-                        //         title: '',
-                        //         message: '服务器异常,请稍后再试',
-                        //         type: 'error'
-                        //     });
-                        // });
                     } else if (state.merchants.length > '1') { //有多个组织列表
                         state.CardBox = loginBox;
 
