@@ -2,12 +2,12 @@
 <div class="mytable">
     <div class="table">
         <ul class="header">
-            <li class="list" v-for="(item, index) of titleInfo">
+            <li class="list" v-for="(item, index) of titleInfo" :key="item">
                 <div class="label">{{item.label}}</div>
             </li>
         </ul>
-        <ul class="v-content" v-for="(text, index) of tableData">
-            <li class="list" v-for="value of text">
+        <ul class="v-content" v-for="(text, index) of tableData" :key="item">
+            <li class="list" v-for="value of text" :key="item">
                 <div class="value" v-html="value">
                     <slot></slot>
                 </div>

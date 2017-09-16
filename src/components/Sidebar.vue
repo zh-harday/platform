@@ -13,10 +13,9 @@
                 </div>
             </div>
 
-            <el-menu v-if="!showOrHide.isShowSidebar" :default-active="onRoutes" class="el-menu-vertical-demo" theme="dark" unique-opened router @open="handleOpen" @close="handleClose">
+            <el-menu :default-active="onRoutes" class="el-menu-vertical-demo" theme="dark" unique-opened router @open="handleOpen" @close="handleClose">
                 <el-submenu index="9">
                     <template slot="title">
-                        <!-- <i class="el-icon-star-on"></i>平台管理 -->
                         <img style="margin-top: 18px;display: block;float: left;margin-right: 7px;" src="/static/img/wangluo.png" />
                         <span>{{title_09}}</span>
                     </template>
@@ -30,12 +29,6 @@
                     <el-menu-item index="memberManagement" @click="addTab(title34, '/home/memberManagement', 'memberManagement')">{{title34}}</el-menu-item>
                 </el-submenu>
             </el-menu>
-            <!-- <el-row>
-                     <el-col :span="24" v-for="(menuItem,index) in theModel" :key="index">
-                                                                                                <my-tree :model="menuItem"></my-tree>
-                                                                                            </el-col>
-                                                                                        </el-row> -->
-            <!-- <ul id="zTree" class="ztree"></ul> -->
         </div>
     </div>
 </template>
@@ -48,9 +41,9 @@ import { getNodes } from 'common/js/config';
 import myTree from 'components/treeMenu';
 export default {
     components: { myTree },
-    beforeCreate() { },
-    created() { },
-    mounted() { },
+    beforeCreate() {},
+    created() {},
+    mounted() {},
     computed: {
         onRoutes(state) {
             // alert(111);
@@ -65,16 +58,6 @@ export default {
             // alert(333);
             this.$store.state.login.logoSrc = JSON.parse(sessionStorage.getItem('merchants')) || {};
             return this.$store.state.login.merchants;
-        },
-        showOrHide() {
-            if (JSON.parse(sessionStorage.getItem('showOrHide')) == '' || JSON.parse(sessionStorage.getItem('showOrHide')) == 'undefined') {
-                this.$store.state.login.showOrHide.isVshowYe = 0;
-                this.$store.state.login.showOrHide.isShowSidebar = 1;
-                return this.$store.state.login.showOrHide;
-            } else {
-                this.$store.state.login.showOrHide = JSON.parse(sessionStorage.getItem('showOrHide')) || {};
-                return this.$store.state.login.showOrHide;
-            }
         }
     },
     data() {

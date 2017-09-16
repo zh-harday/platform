@@ -1,13 +1,13 @@
 <template>
 <div class="myFilter">
     <ul class="choose">
-        <li v-for="(item, index) of chooseInfo" class="lists" key="index">
+        <li v-for="(item, index) of chooseInfo" class="lists" :key="item">
             <div class="title" v-show="item.title">
               {{item.title}}
             </div>
             <div class="ul_list">
                 <ul class="listWrapper">
-                    <li class="list" v-for="(list, nowIndex) of item.details">
+                    <li class="list" v-for="(list, nowIndex) of item.details" :key="item">
                         <el-button @click="changeList(index, nowIndex)"
                                    :class="{active: nowIndex == 0}"
                                    class="btn">

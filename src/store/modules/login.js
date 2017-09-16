@@ -17,11 +17,7 @@ const state = {
     },
     CardBox: loginCard
 }
-// const mutations = {
-//     [types.SET_TITLELIST](state, targetName) {
-//         state.TitleList = targetName
-//     }
-// }
+
 const mutations = {
     addTab(state, targetName) {
         let obj = {};
@@ -74,12 +70,12 @@ const actions = {
     loginAPI({
         commit,
         state
-    }, userPwd) { //send login API
-        // console.log(userPwd);
-        // userPwd.self.$http.post('http://localhost:8080/api/user/login', {
-        userPwd.self.$http.post('api/user/login', {
-            // number: userPwd.name,
-            // pass: userPwd.pwd
+    }, user) { //send login API
+        // console.log(user);
+        // user.self.$http.post('http://localhost:8080/api/user/login', {
+        user.self.$http.post('api/user/login', {
+            // number: user.name,
+            // pass: user.pwd
             number: "010",
             pass: "e10adc3949ba59abbe56e057f20f883e"
         }).then(data => {
@@ -93,7 +89,7 @@ const actions = {
                 return;
             } else if (data.data.status == '200') { //登录成功
                 // alert('success');
-                console.log(userPwd);
+                console.log(user);
                 commit('pushUserInfor', data.data.result);
                 window.sessionStorage.setItem('userInfor', JSON.stringify(state.userInfor));
                 console.log(state.userInfor);
@@ -109,7 +105,7 @@ const actions = {
                         state.logoSrc.merchantName = data.data.result.merchants[0].merchant_name;
                         window.sessionStorage.setItem('logoSrc', JSON.stringify(state.logoSrc));
                         // console.log(state.logoSrc);
-                        userPwd.self.$router.push({
+                        user.self.$router.push({
                             name: 'homeContent'
                         });
                         commit('Notification', {
@@ -121,10 +117,8 @@ const actions = {
                         state.CardBox = loginBox;
 
                     }
-                    // console.log(state.merchants.length);
-
                 } else if (data.data.result.userInfo.isMerchant == '0') { //无组织(不存在这种情况)
-                    userPwd.self.$router.push({
+                    user.self.$router.push({
                         name: 'homeContent'
                     });
                 }
