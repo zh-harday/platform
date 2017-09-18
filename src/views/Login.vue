@@ -1,9 +1,21 @@
 <template>
     <div class="login-wrap">
         <div>
+            <div class="login-top">
+                <span>
+                    <img src="/static/img/images/logo_02.png" style="width:75px;height:75px"></img>
+                </span>
+                <div class="right_text">
+                    <span class="rtext_top">独角兽</span>
+                    <span class="rtext_bottom">THE UNLCORN</span>
+                </div>
+                <div style="border-left:6px solid #fff;padding-left:15px;">
+                    <span style="font-size:50px;font-weight:bold;color:#fff;">价值投资 远见卓识</span>
+                </div>
+            </div>
+
             <div class="login-entangle">
-                <p class="login-left">Lead Investor</p>
-                <p class="login-center">Financial investment</p>
+                <p class="login-left">项目类型</p>
                 <div class="login-bottom">
                     <span class="left-fir">高效</span>
                     <span class="left-dot"></span>
@@ -15,25 +27,11 @@
             <div class="login-box">
                 <component :is="CardBox" @goBack="goBack" @checkVata="checkVataa" @changePassword="getPwd" @changeName="getName" @sendVal="getval">
                 </component>
+                <div class="find-pass">
+                    <el-checkbox v-model="checked" style="color:#fff">记住密码，下次直接登录</el-checkbox>
+                </div>
                 <div class="login_btn">
                     <button type="button" class="login-btn" @click="submitForm" :class="{ active : valueData }">登录</button>
-                </div>
-                <hr class="hr" />
-                <div class="login-right-bottom">
-                    <p>
-                        <img src="/static/img/联系我们.png">
-                    </p>
-                    <p>
-                        <img src="/static/img/关于我们.png">
-                    </p>
-                    <p>
-                        <img src="/static/img/App下载.png">
-                    </p>
-                </div>
-                <div class="login-footer">
-                    <p>联系我们</p>
-                    <p>关于我们</p>
-                    <p>APP下载</p>
                 </div>
             </div>
         </div>
@@ -52,16 +50,12 @@ export default {
     },
     data() {
         return {
+            checked: false,
             userName: '',
             passWord: '',
             valueData: false,
             loginImg: [
                 { logo: "../static/img/2.png", merchant_name: "阿里巴巴1" },
-                // { logo: "../static/img/2.png", merchant_name: "腾讯企业2" },
-                // { logo: "../static/img/2.png", merchant_name: "百度搜索3" },
-                // { logo: "../static/img/2.png", merchant_name: "深度网络4" },
-                // { logo: "../static/img/2.png", merchant_name: "大唐电信5" },
-                // { logo: "../static/img/2.png", merchant_name: "中国移动6" },
             ],
         }
     },
@@ -80,12 +74,13 @@ export default {
             }
         },
         submitForm() {
+            console.log(this.checked);
             if (this.valueData) {
                 sessionStorage.clear();
                 this.$router.push({ name: 'homeContent' });
                 let number = this.userName;
                 // let pass = this.passWord;
-                let pass = md5(this.passWord,32);
+                let pass = md5(this.passWord, 32);
                 // console.log(pass);
                 this.userName = '';
                 this.passWord = '';
@@ -117,7 +112,7 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: url(/static/img/bg.png) no-repeat center center;
+    background: url(/static/img/images/bg_02.png) no-repeat center center;
     >div {
         position: absolute;
         top: 0;
@@ -139,14 +134,9 @@ body {
 }
 
 .login-left {
-    font-size: 50px;
+    font-size: 30px;
     color: #fff;
     font-family: ITC Avant Garda Gothic Demi Regular;
-}
-
-.login-center {
-    font-size: 40px;
-    color: #afacae;
 }
 
 span {
@@ -157,62 +147,88 @@ span {
     top: 800px;
 }
 
+.login-top {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    width: 50%;
+    top: 12%;
+    left: 17%;
+    color: #fff;
+}
+
+.right_text {
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+    margin-right: 55px;
+}
+
+.rtext_top {
+    font-size: 50px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.rtext_bottom {
+    font-size: 22px;
+    color: #fff;
+}
+
 .login-entangle {
     width: 35%;
     position: absolute;
-    top: 30%;
-    left: 20%;
+    top: 50%;
+    left: 17%;
 }
 
 .login-bottom {
     font-size: 28px;
-    margin-top: 42px;
+    margin-top: 25px;
 }
 
 .left-sec {
-    margin-left: 30px;
+    margin-left: 5px;
 }
 
 .left-thi {
-    margin-left: 30px;
+    margin-left: 5px;
 }
 
 .left-dot,
 .right-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: #aca7a7;
+    background-color: #fff;
     display: inline-block;
-    margin-left: 20px;
+    margin-left: 5px;
     margin-bottom: 5px;
 }
 
-.ms-login {
-    margin-left: 10px;
-    margin-top: 48px;
-}
-
+// .ms-login {
+//     margin-left: 10px;
+//     margin-top: 48px;
+// }
 input::-webkit-input-placeholder {
     color: #a6a9ad;
 }
 
 .login-box {
-    // width: 35%;
-    text-align: center;
     position: absolute;
-    top: 30%;
-    left: 55%;
-    border-left: solid 2px #a6a9ad;
+    top: 50%;
+    left: 58%;
+    padding: 15px 10px;
+    text-align: center;
+    border-radius: 10px;
+    background-color: rgba(134, 144, 164, 0.5);
 }
 
 .login-name {
-    // width: 382px;
-    font-size: 24px;
+    font-size: 22px;
     color: #fff;
     font-family: "微软雅黑";
-    margin-bottom: 24px;
-    margin-left: 82px;
+    margin-bottom: 24px; // margin-left: 82px;
 }
 
 .login-account {
@@ -245,11 +261,11 @@ input::-webkit-input-placeholder {
 }
 
 .find-pass {
-    // width: 382px;
+    text-align: left;
+    margin: 10px 0 64px 22px;
+    margin-left: 22px;
     font-size: 16px;
-    margin-bottom: 64px;
-    margin-left: 48px;
-    /*clear: both;*/
+    color: #fff;
 }
 
 .pass-find {
@@ -264,21 +280,20 @@ input::-webkit-input-placeholder {
 
 .login-btn {
     width: 382px;
-    height: 54px;
-    font-size: 24px;
-    border-radius: 30px;
-    margin-left: 82px;
-    background: #f05e5e;
+    height: 45px;
+    font-size: 20px;
+    border-radius: 5px; // margin-left: 82px;
+    background: #5076b0;
     border: none;
     margin-bottom: 64px;
     color: #fff;
     margin-top: 4px;
     outline: none;
     &:hover {
-        background: #803f3f;
+        background: #5076e0;
     }
     &:active {
-        background: #f05e5e;
+        background: blue;
     }
 }
 
@@ -313,7 +328,7 @@ input::-webkit-input-placeholder {
 }
 
 .active {
-    background: red;
+    background: blue;
 }
 
 .loginCard {
