@@ -74,7 +74,7 @@ export default {
             }
         },
         submitForm() {
-            console.log(this.checked);
+            // console.log(this.checked);
             if (this.valueData) {
                 sessionStorage.clear();
                 this.$router.push({ name: 'homeContent' });
