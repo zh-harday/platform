@@ -10,6 +10,10 @@ export function changeDate(value) {
     }
     return [year, month, day].join('-')
 }
+export function getDate(value) {
+    var tt = new Date(value).toLocaleString().replace(/\//g, "-");
+    return tt;
+}
 // 待测试
 export function clearValue(obj) {
     Object.keys(obj).forEach((val, array) => {
@@ -24,16 +28,16 @@ export function getNodes(arr) {
         if (node.parentId === '0') {
             nodes.push(node)
         } else {
-            pushNode(node,nodes)
+            pushNode(node, nodes)
         }
     })
     // console.log(nodes);
     return nodes
 }
 
- function pushNode(node, pNodes) {
+function pushNode(node, pNodes) {
     //  alert(111);
-     let charlds = [];
+    let charlds = [];
     pNodes.map(function (pNode) {
         // console.log(pNode.children);
         if (pNode.id == node.parentId) {
@@ -53,5 +57,3 @@ export function getNodes(arr) {
         }
     })
 }
-
-

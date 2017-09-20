@@ -4,60 +4,6 @@
         <div>
             <el-row class="common sys_menu_head">
                 <el-col :span="4">
-                    <!-- <el-table border :data="featuresTabData" style="width:100%" max-height="700" class="table-item" :row-class-name="tableRowClassName">
-                                <el-table-column prop="name" label="名称" align="center">
-                                    <template scope="scope">
-                                        <span v-if="!scope.row.editFlag">{{ scope.row.name }}</span>
-                                        <span v-if="scope.row.editFlag" class="cell-edit-input">
-                                            <el-input v-model="scope.row.name" placeholder=""></el-input>
-                                        </span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="link" label="链接" align="center">
-                                    <template scope="scope">
-                                        <span v-if="!scope.row.editFlag">{{ scope.row.link }}</span>
-                                        <span v-if="scope.row.editFlag" class="cell-edit-input">
-                                            <el-input v-model="scope.row.link" placeholder=""></el-input>
-                                        </span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="creatDate" label="创建日期" align="center">
-                                    <template scope="scope">
-                                        <span v-if="!scope.row.editFlag">{{ scope.row.creatDate }}</span>
-                                        <span v-if="scope.row.editFlag" class="cell-edit-input">
-                                            <el-input v-model="scope.row.creatDate" placeholder=""></el-input>
-                                        </span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="modifyDate" label="修改日期" align="center">
-                                    <template scope="scope">
-                                        <span v-if="!scope.row.editFlag">{{ scope.row.modifyDate }}</span>
-                                        <span v-if="scope.row.editFlag" class="cell-edit-input">
-                                            <el-input v-model="scope.row.modifyDate" placeholder=""></el-input>
-                                        </span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="remarks" label="备注" align="center">
-                                    <template scope="scope">
-                                        <span v-if="!scope.row.editFlag">{{ scope.row.remarks }}</span>
-                                        <span v-if="scope.row.editFlag" class="cell-edit-input">
-                                            <el-input v-model="scope.row.remarks" placeholder=""></el-input>
-                                        </span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="操作" min-width="100" align="center">
-                                    <template scope="scope">
-                                        <el-button class="el-icon-plus" type="text" size="small" @click="addMenu(scope.$index,scope.row)">
-                                        </el-button>
-                                        <el-button v-if="!scope.row.editFlag" class="el-icon-edit" type="text" size="small" @click="checkEdit(scope.$index,scope.row)">
-                                        </el-button>
-                                        <el-button v-if="scope.row.editFlag" class="el-icon-check" type="text" size="small" @click="checkEdit(scope.$index,scope.row)">
-                                        </el-button>
-                                        <el-button class="el-icon-delete2" type="text" size="small" @click.native.prevent="remove(scope.$index, featuresTabData)">
-                                        </el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table> -->
                     <div>名称</div>
                 </el-col>
                 <el-col :span="4">
@@ -77,48 +23,58 @@
                 </el-col>
             </el-row>
             <!-- sys menu -->
-            <el-row class="common menus" v-for="(item,index) in menus" :key="item">
-                <el-col :span="4">
-                    <div>{{item.menuName}}</div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
+            <el-row>
+                <el-col :span="24" v-for="(item,index) in menus" :key="item">
+                    <el-row class="common sys_menu_head_2">
+                        <el-col :span="4">
+                            <div>{{item.menuName}}</div>
+                        </el-col>
+                        <el-col :span="4">
+                            <div>{{item.url}}</div>
+                        </el-col>
+                        <el-col :span="4">
+                            <div>{{item.createDate}}</div>
+                        </el-col>
+                        <el-col :span="4">
+                            <div>{{item.versionRecord}}</div>
+                        </el-col>
+                        <el-col :span="4">
+                            <div>{{item.description}}</div>
+                        </el-col>
+                        <el-col :span="4">
+                            <div>
+                                <el-button style="color:#5c6b77" type="text" @click="addMenu(item)">
+                                    <Icon size="20" type="plus-round"></Icon>
+                                </el-button>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-table :show-header="false" :data="item.children" border style="width: 100%">
+                        <el-table-column prop="menuName" label="" align="center">
+                        </el-table-column>
+                        <el-table-column prop="url" label="" align="center">
+                        </el-table-column>
+                        <el-table-column prop="createDate" label="" align="center">
+                        </el-table-column>
+                        <el-table-column prop="versionRecord" label="" align="center">
+                        </el-table-column>
+                        <el-table-column prop="description" label="" align="center">
+                        </el-table-column>
+                        <el-table-column prop="operating" label="" align="center">
+                            <template scope="scope">
+                                <el-button style="color:#5c6b77" type="text" @click="addMenu(scope.row)">
+                                    <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row)">
+                                    <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.$index, item.children)">
+                                    <Icon size="20" type="trash-a"></Icon>
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </el-col>
             </el-row>
-            <el-row class="common">
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-                <el-col :span="4">
-                    <div></div>
-                </el-col>
-            </el-row>
-            <!--  -->
-            <!-- 添加 Dialog -->
+            <!-- sys menu end -->
             <el-dialog title="新建" :visible.sync="dialogFormVisible1">
                 <el-form :model="addFormData" ref="addFormData">
                     <el-row :gutter="20">
@@ -175,12 +131,15 @@
 
 <script>
 import { getNodes } from 'common/js/config'
+import { getDate } from 'common/js/config'
 export default {
     created() {
         this.sysMenuQueryList();//查询功能菜单列表数据
     },
     data() {
         return {
+            MenutableData1: [],
+            MenutableData2: [],
             menus: [],
             featuresTabData: [
                 {
@@ -211,9 +170,14 @@ export default {
             })
                 .then(res => {
                     if (res.status == '200') {
-                        console.log(res.data);
+                        console.log(res.data.result);
+                        res.data.result.forEach(function(item) {
+                            item.createDate = getDate(item.createDate);
+                            item.versionRecord = getDate(item.versionRecord);
+                        },this);
                         this.menus = getNodes(res.data.result);
                         console.log(this.menus);
+                        // console.log(this.menus);
                     } else if (res.status == '403') {
                         alert(res.data.message);
                     }
@@ -222,7 +186,8 @@ export default {
                     console.log(error);
                 })
         },
-        addMenu(index, row) { //添加
+        addMenu(row) { //添加
+            console.log(row);
             let new_addFormData = {
                 name: "",
                 link: "",
@@ -234,12 +199,12 @@ export default {
             this.addFormData = new_addFormData;
             this.dialogFormVisible1 = true;
         },
-        checkEdit(index, row) { //编辑
+        editMenu(row) { //编辑
             // console.log(row)
             row.editFlag = !row.editFlag;
         },
-        remove(index, rows) { //删除
-            rows.splice(index, 1);
+        deletMenu(index, row) { //删除
+            row.splice(index, 1);
         },
         determin() { //确定
             this.featuresTabData.push(this.addFormData);
@@ -270,18 +235,27 @@ section {
                 border: 1px solid #fff;
             }
         }
-        .menus{
+        .sys_menu_head_2 {
+            width: 100%;
+            height: 40px;
+            overflow: hidden;
+            line-height: 40px;
+            box-sizing: border-box;
+            div {
+                text-align: center;
+                box-sizing: border-box;
+                border: 1px solid #dfe6ec;
+            }
+        }
+        .menus {
             width: 100%;
             height: 50px;
             overflow: hidden;
             line-height: 50px;
             text-align: center;
-            >div{
+            >div {
                 border: 1px solid #cccccc;
                 box-sizing: border-box;
-                >div{
-
-                }
             }
         }
     }
