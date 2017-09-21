@@ -77,11 +77,11 @@ export default {
             // console.log(this.checked);
             if (this.valueData) {
                 sessionStorage.clear();
-                this.$router.push({ name: 'homeContent' });
+                // this.$router.push({ name: 'homeContent' });
                 let number = this.userName;
-                // let pass = this.passWord;
                 let pass = md5(this.passWord, 32);
-                // console.log(pass);
+                // let pass = this.passWord;
+                console.log(pass);
                 this.userName = '';
                 this.passWord = '';
                 this.valueData = false;

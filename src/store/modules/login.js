@@ -83,10 +83,11 @@ const actions = {
                 alert(data.data.message);
             } else if (data.data.status == '156') { //用户名或密码不正确
                 alert(data.data.message);
+                // this.$Message.error(res.data.message);
                 console.log(data.data.message);
                 return;
             } else if (data.status == '200') { //登录成功
-                // alert('success');
+                // this.$Message.success(res.data.message);
                 console.log(data.data);
                 commit('pushUserInfor', data.data.result);
                 window.sessionStorage.setItem('userInfor', JSON.stringify(state.userInfor));
@@ -98,9 +99,8 @@ const actions = {
                         commit('pushMerchants', data.data.result);
                         window.sessionStorage.setItem('merchants', JSON.stringify(state.merchants));
                         console.log(state.merchants);
-                        user.self.$router.push({ //只显示通讯录菜单列表
+                        user.self.$router.push({
                             name: 'homeContent'
-                            // name: 'homeContent'
                         });
                         commit('Notification', {
                             title: '',
