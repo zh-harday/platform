@@ -118,23 +118,23 @@
                         </el-col>
                     </el-row>
                     <!-- <el-row :gutter="20">
-                                                <el-col :span="12">
-                                                    <div class="grid-content bg-purple-dark">
-                                                        <el-form-item label="创建日期" prop="creatDate" :label-width="addFormLabelWidth">
-                                                            <el-date-picker @change="getDate" v-model="addMenusFormData.creatDate" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
-                                                            </el-date-picker>
-                                                        </el-form-item>
-                                                    </div>
-                                                </el-col>
-                                                <el-col :span="12">
-                                                    <div class="grid-content bg-purple-dark">
-                                                        <el-form-item label="修改日期" prop="versionRecord" :label-width="addFormLabelWidth">
-                                                            <el-date-picker @change="getDate" v-model="addMenusFormData.versionRecord" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
-                                                            </el-date-picker>
-                                                        </el-form-item>
-                                                    </div>
-                                                </el-col>
-                                            </el-row> -->
+                                                    <el-col :span="12">
+                                                        <div class="grid-content bg-purple-dark">
+                                                            <el-form-item label="创建日期" prop="creatDate" :label-width="addFormLabelWidth">
+                                                                <el-date-picker @change="getDate" v-model="addMenusFormData.creatDate" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
+                                                                </el-date-picker>
+                                                            </el-form-item>
+                                                        </div>
+                                                    </el-col>
+                                                    <el-col :span="12">
+                                                        <div class="grid-content bg-purple-dark">
+                                                            <el-form-item label="修改日期" prop="versionRecord" :label-width="addFormLabelWidth">
+                                                                <el-date-picker @change="getDate" v-model="addMenusFormData.versionRecord" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
+                                                                </el-date-picker>
+                                                            </el-form-item>
+                                                        </div>
+                                                    </el-col>
+                                                </el-row> -->
                     <el-row :gutter="20">
                         <el-col :span="24">
                             <div class="grid-content bg-purple-dark">
@@ -164,6 +164,7 @@ export default {
     },
     data() {
         return {
+            checked: true,
             menus: [],
             rowMenuID: {}, //添加菜单pid
             featuresTabData: [

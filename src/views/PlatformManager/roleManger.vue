@@ -3,7 +3,7 @@
     <!-- 这是角色管理 -->
     <div id="roleManger">
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="grid-content bg-purple-dark">
             <el-button type="primary" class="addBtn" @click="addBtn">添加</el-button>
           </div>
@@ -30,19 +30,19 @@
         <el-col :span="8">
           <div class="grid-content bg-purple">
             <el-table :data="rolTabData_L" border style="width: 100%" align="center">
-              <el-table-column prop="roleName" label="角色名称" width="240px" align="center">
+              <el-table-column prop="roleName" label="角色名称" width="" align="center">
                 <template scope="scope">
-                  <span class="cursor" @click="roleEdit(row, column, cell, event)" v-if="!scope.row.editFlag">{{ scope.row.roleName }}</span>
-                  <span v-if="scope.row.editFlag" class="cell-edit-input">
+                  <span class="cursor" @click="findByRid(scope.$index,scope.row)" v-if="!scope.row.isAdmin">{{ scope.row.roleName }}</span>
+                  <span v-if="scope.row.isAdmin" class="cell-edit-input">
                     <el-input v-model="scope.row.roleName" placeholder=""></el-input>
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="240px" align="center">
-                <template scope="scope" v-show="scope.row.isAdmin != '0' ">
-                  <el-button v-show="scope.row.isAdmin == '0'" @click="editSelecttionTab(scope.$index,scope.row)" type="primary" size="small">编辑</el-button>
-                  <el-button v-show="scope.row.isAdmin == '0'" @click="editSelecttionTab(scope.$index,scope.row)" type="primary" size="small">保存</el-button>
-                  <el-button v-show="scope.row.isAdmin == '0'" @click="remove(scope.$index,rolTabData_L)" type="primary" size="small">删除</el-button>
+              <el-table-column label="操作" width="" align="center">
+                <template scope="scope">
+                  <el-button v-if="!scope.row.isAdmin" @click="editSelecttionTab(scope.$index,scope.row)" type="primary" size="small">编辑</el-button>
+                  <el-button v-if="scope.row.isAdmin" @click="saveSelecttionTab(scope.$index,scope.row)" type="primary" size="small">保存</el-button>
+                  <el-button v-if="!scope.row.isAdmin" @click="remove(scope.index,scope.row,rolTabData_L)" type="primary" size="small">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -63,17 +63,30 @@
               </el-col>
             </el-row>
             <!-- 权限列表 Start -->
-            
-            <!-- 权限列表 End -->
-            <el-table @selection-change="handleSelectionChange" ref="multipleTable" :show-header="false" :data="rolTabData_R" border style="width: 100%" align="center">
-              <el-table-column prop="roleName" label="权限名称" width="" align="center">
-              </el-table-column>
-              <!-- <el-table-column prop="operating" label="操作" width="" align="center">
-                                                              </el-table-column> -->
-              <el-table-column :selectable="checkSelectable" type="selection" width="" align="center">
-              </el-table-column>
-            </el-table>
 
+            <!-- 权限列表 End -->
+            <!-- sys menu -->
+            <el-row>
+              <el-col :span="24" v-for="(item,index) in menus" :key="item">
+                <el-row class="common sys_menu_head_2">
+                  <el-col :span="15">
+                    <div class="menuName">{{item.menuName}}</div>
+                  </el-col>
+                  <el-col :span='9'>
+                    <div class="checkbox">
+                      <el-checkbox v-model="checked"></el-checkbox>
+                    </div>
+                  </el-col>
+                </el-row>
+                <el-table stripe :show-header="false" :data="item.children" border style="width: 100%">
+                  <el-table-column prop="menuName" label="" align="center" width="">
+                  </el-table-column>
+                  <el-table-column :selectable="checkSelectable" type="selection" width="" align="center">
+                  </el-table-column>
+                </el-table>
+              </el-col>
+            </el-row>
+            <!-- sys menu end -->
           </div>
         </el-col>
       </el-row>
@@ -84,6 +97,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getNodes } from 'common/js/config'
 export default {
   computed: {
     userId(state) {
@@ -107,13 +121,19 @@ export default {
   },
   mounted() {
     this.rolTabData_R.forEach(row => {
-      this.$refs.multipleTable.toggleRowSelection(row);
+      // this.$refs.multipleTable.toggleRowSelection(row);
     });
     // console.log(this.userInfor);
     // console.log(this.merchants[0].um_id);
   },
   data() {
     return {
+      checked: 0,
+      menusName: [{
+        children: [],
+      }
+      ],
+      menus: [],
       merchants: [], //企业信息
       userInfor: {}, //用户信息
       merchantId: '', //企业id
@@ -159,13 +179,30 @@ export default {
         .then(res => {
           if (res.status == '200') {
             console.log(res.data.result);
+            this.menus = getNodes(res.data.result);
+            console.log('***********************');
+            console.log(this.menus);
+            this.menus.forEach(function(item, index) {
+              let obj1 = {};
+              obj1.menuName = item.menuName;
+              obj1.selected = false;
+              this.menusName.push(obj1);
+              if (item.children != '') {
+                item.children.forEach(function(item, index) {
+                  let obj2 = {};
+                  obj2.menuName = item.menuName;
+                  obj2.selected = false;
+                  this.menusName.children.push(obj2);
+                }, this);
+              }
+            }, this);
+            console.log('aaa');
+            console.log(this.menus);
             this.$Message.success(res.data.message);
-          } else if (res.status == '403') {
-            this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          this.$Message.error('请求超时');
         })
     },
     saveRole() { //新增角色
@@ -176,6 +213,7 @@ export default {
         .then(res => {
           if (res.status == '200') {
             console.log(res.data.result);
+            this.queryRoleListByUM();
             this.$Message.success(res.data.message);
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
@@ -185,10 +223,79 @@ export default {
           this.$Message.error(res.data.message);
         })
     },
-    roleEdit(row, column, cell, $event) {
-      this.rolTabData_R.forEach(item => {
-        item.check = true;
-      });
+    deleteRole(id) { //删除角色
+      this.$http.post('/api/role/deleteRole', {
+        "roleId": id,
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data.result);
+            this.queryRoleListByUM();
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error(res.data.message);
+        })
+    },
+    updateRole(roleName) { //编辑保存角色
+      this.$http.post('/api/role/updateRole', {
+        "roleName": roleName,
+        "merchantId": this.merchants[0].id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data.result);
+            this.queryRoleListByUM();
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error(res.data.message);
+        })
+    },
+    findResourceByRid(id) { //查询角色对应权限
+      this.$http.post('/api/role/findResourceByRid', {
+        "r_id": id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data.result);
+            // this.queryRoleListByUM();
+            for (let n = 0; n < this.menusName.length; n++) {
+              this.menusName[n].selected = 0;
+            };
+            for (let i = 0; i < res.data.result.length; i++) {
+              for (let k = 0; k < this.menusName.length; k++) {
+                if (res.data.result[i].menuName == this.menusName[k].menuName) {
+                  this.menusName[k].selected = 1;
+                  this.menus = this.menusName;
+                }
+              }
+            };
+            console.log('//////////////////////////////////');
+            console.log(this.menus);
+            console.log(this.menusName);
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error(res.data.message);
+        })
+    },
+    findByRid(index, row) { //查询角色
+      // alert(111);
+      console.log(row);
+      this.findResourceByRid(row.id);
+      // this.rolTabData_R.forEach(item => {
+      //   item.check = true;
+      // });
     },
     pushRolTabData_L() { //确定
       this.rolTabData_L.push(this.rolFormData_L);
@@ -201,12 +308,17 @@ export default {
       this.rolFormData_L = new_rolFormData_L;
       this.rolFormDialog = true;
     },
-    remove(index, rows) { //删除
-      rows.splice(index, 1);
+    remove(index, row, data) { //删除
+      console.log(row);
+      data.splice(index, 1);
+      this.deleteRole(row.id);
+    },
+    saveSelecttionTab(index, row) { //编辑保存角色
+      this.updateRole(row.roleName);
     },
     editSelecttionTab(index, row) { //编辑
       // alert(1002);
-      row.editFlag = !row.editFlag;
+      row.isAdmin = !row.isAdmin;
     },
     handleSelectionChange(val) { //选中的数据
       this.multipleSelection = val;
@@ -241,6 +353,21 @@ section {
     }
     .roleName_spanBoder {
       text-align: center;
+    }
+    .sys_menu_head_2 {
+      width: 100%;
+      height: 40px;
+      overflow: hidden;
+      line-height: 40px;
+      box-sizing: border-box;
+      div {
+        text-align: center;
+        box-sizing: border-box;
+        border-left: 1px solid #dfe6ec;
+      }
+      .checkbox {
+        border-right: 1px solid #dfe6ec;
+      }
     }
   }
 }
