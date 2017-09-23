@@ -209,7 +209,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
+          // this.$Message.error('请求超时');
+          console.log('请求超时');
         })
     },
     findResourceByMid() { //查询企业权限列表
@@ -246,7 +247,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
+          // this.$Message.error('请求超时');
+          console.log('请求超时');
         })
     },
     saveRole() { //新增角色
@@ -264,7 +266,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          // this.$Message.error(res.data.message);
+          console.log('请求超时');
         })
     },
     deleteRole(id) { //删除角色
@@ -281,7 +284,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          // this.$Message.error(res.data.message);
+          console.log('请求超时');
         })
     },
     updateRole(roleName) { //编辑保存角色
@@ -303,7 +307,8 @@ export default {
         })
         .catch(error => {
           alert(888);
-          this.$Message.error('请求超时');
+          // this.$Message.error('请求超时');
+          console.log('请求超时');
         })
     },
     findResourceByRid(id) { //查询角色对应权限
@@ -343,7 +348,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
+          // this.$Message.error('请求超时');
+          console.log('请求超时');
         })
     },
     findByRid(index, row) { //查询角色
@@ -379,7 +385,8 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error("请求超时");
+          // this.$Message.error("请求超时");
+          console.log('请求超时');
         })
     },
     pushRolTabData_L() { //确定
