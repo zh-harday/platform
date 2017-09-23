@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import store from '../store'
+import state from 'vuex'
 
 Vue.use(Router)
 // import r1 from "./r1"
@@ -9,7 +11,7 @@ import r2 from "./r2"
 let arr = [];
 arr = arr.concat(r2)
 
-export default new Router({
+const router = new Router({
     mode: 'history',
     routes: [
         {
@@ -40,3 +42,19 @@ export default new Router({
 
     ]
 })
+router.beforeEach((to, from, next) => { //在所有导航完成之前先判断是否已经登录
+    if(to.path == '/login' || to.path == '/registerphone' || to.path == '/register'){
+        next();
+        return;
+    };
+    store.state.login.logged = JSON.parse(sessionStorage.getItem('setLogged')) || {};
+    var isLogin = store.state.login.logged.isLogged;
+    // console.log(isLogin);
+    if (isLogin ) {
+        // alert(111);
+        next()   // 进行下一个钩子函数  
+    }else {
+       next({path: '/login'})   //  跳转到login页面  
+    }
+})
+export default router

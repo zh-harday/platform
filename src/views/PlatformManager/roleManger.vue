@@ -9,8 +9,9 @@
           </div>
         </el-col>
         <el-col :span="16">
-          <div class="grid-content bg-purple-dark">
+          <div class="grid-content bg-purple-dark saveRoleManger">
             <div>角色权限</div>
+            <el-button type="primary" class="addBtn" @click="authorizationBtn">新增权限</el-button>
           </div>
         </el-col>
       </el-row>
@@ -74,14 +75,17 @@
                   </el-col>
                   <el-col :span='9'>
                     <div class="checkbox">
-                      <el-checkbox v-model="checked"></el-checkbox>
+                      <el-checkbox @change="handleSelectionChange1($event,item)" :v-model="item.selected"></el-checkbox>
                     </div>
                   </el-col>
                 </el-row>
-                <el-table stripe :show-header="false" :data="item.children" border style="width: 100%">
+                <el-table @selection-change="handleSelectionChange2(selection)" stripe :show-header="false" :data="item.children" border style="width: 100%">
                   <el-table-column prop="menuName" label="" align="center" width="">
                   </el-table-column>
-                  <el-table-column :selectable="checkSelectable" type="selection" width="" align="center">
+                  <el-table-column width="398px" align="center">
+                    <template scope="scope">
+                      <el-checkbox @change="handleSelectionChange2($event,scope.row)" :v-model="item.selected"></el-checkbox>
+                    </template>
                   </el-table-column>
                 </el-table>
               </el-col>
@@ -128,17 +132,17 @@ export default {
   },
   data() {
     return {
+      menuIds: '', //保存角色权限
+      ResourceArr: [], //保存角色权限的数组
       checked: 0,
-      menusName: [{
-        children: [],
-      }
-      ],
+      menusName: [],
       menus: [],
       merchants: [], //企业信息
       userInfor: {}, //用户信息
       merchantId: '', //企业id
       rolTabData_L: [], //角色列表
       rolFormDialog: false,
+      roleId: '', //角色id
       rolFormData_L: { roleName: "", editFlag: false },
       rolTabData_R: [
         { roleName: "菜单管理", check: false },
@@ -152,6 +156,42 @@ export default {
     }
   },
   methods: {
+    forEachArr(id) {
+      for (let i in this.ResourceArr) {
+        if (this.ResourceArr[i] == id) {
+          return i;
+        }
+      }
+    },
+    handleSelectionChange1(event, item) {
+      //alert(111);
+      this.multipleSelection = item;
+      console.log(event.target.checked);
+      console.log(this.multipleSelection);
+      if (event.target.checked) {
+        this.ResourceArr.push(item.id);
+      } else {
+        let index = this.forEachArr(item.id);
+        this.ResourceArr.splice(index, 1);
+        console.log(this.ResourceArr)
+      }
+      console.log('111111111111111111111111');
+      console.log(this.ResourceArr);
+    },
+    handleSelectionChange2(event, row) {
+      //alert(222);
+      this.multipleSelection = row;
+      console.log(event.target.checked);
+      console.log(this.multipleSelection);
+      if (event.target.checked) {
+        this.ResourceArr.push(row.id);
+      } else {
+        let index = this.forEachArr(row.id)
+        this.ResourceArr.splice(index, 1);
+      };
+      console.log('22222222222222222222222222222');
+      console.log(this.ResourceArr);
+    },
     queryRoleListByUM() { //查询用户角色列表
       // this.$http.post('/api/role/queryRoleListByUM', {
       this.$http.post('/api/role/queryRoleList', {
@@ -169,7 +209,7 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          this.$Message.error('请求超时');
         })
     },
     findResourceByMid() { //查询企业权限列表
@@ -182,13 +222,15 @@ export default {
             this.menus = getNodes(res.data.result);
             console.log('***********************');
             console.log(this.menus);
-            this.menus.forEach(function(item, index) {
+            this.menus.forEach(function(ele, index) {
+              // alert(111);
               let obj1 = {};
-              obj1.menuName = item.menuName;
+              obj1.menuName = ele.menuName;
               obj1.selected = false;
               this.menusName.push(obj1);
-              if (item.children != '') {
-                item.children.forEach(function(item, index) {
+              if (item.children) {
+                ele.children.forEach(function(item, index) {
+                  alert(222);
                   let obj2 = {};
                   obj2.menuName = item.menuName;
                   obj2.selected = false;
@@ -196,7 +238,9 @@ export default {
                 }, this);
               }
             }, this);
-            console.log('aaa');
+            console.log('/****menusName*****/');
+            console.log(this.menusName);
+            console.log('/****menus*********/');
             console.log(this.menus);
             this.$Message.success(res.data.message);
           }
@@ -247,15 +291,19 @@ export default {
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data.result);
-            this.queryRoleListByUM();
-            this.$Message.success(res.data.message);
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.queryRoleListByUM();
+              this.$Message.success(res.data.message);
+            }
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
+            return;
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          alert(888);
+          this.$Message.error('请求超时');
         })
     },
     findResourceByRid(id) { //查询角色对应权限
@@ -266,17 +314,26 @@ export default {
           if (res.status == '200') {
             console.log(res.data.result);
             // this.queryRoleListByUM();
-            for (let n = 0; n < this.menusName.length; n++) {
-              this.menusName[n].selected = 0;
+            alert(555);
+            for (let m = 0; m < this.menusName.length; m++) {
+              this.menusName[m].selected = 0;
+              if (this.menusName.children != '') {
+                for (let n = 0; n < this.menusName.children.length; n++) {
+                  alert(1);
+                  this.menusName.children[n].selected = 0;
+                };
+              };
             };
             for (let i = 0; i < res.data.result.length; i++) {
               for (let k = 0; k < this.menusName.length; k++) {
                 if (res.data.result[i].menuName == this.menusName[k].menuName) {
                   this.menusName[k].selected = 1;
-                  this.menus = this.menusName;
+                  // this.menus = this.menusName;
+                  alert(2);
                 }
               }
             };
+            alert(3);
             console.log('//////////////////////////////////');
             console.log(this.menus);
             console.log(this.menusName);
@@ -286,16 +343,44 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error(res.data.message);
+          this.$Message.error('请求超时');
         })
     },
     findByRid(index, row) { //查询角色
-      // alert(111);
+      // alert(2320);
       console.log(row);
+      this.roleId = row.id; //保存角色id
       this.findResourceByRid(row.id);
       // this.rolTabData_R.forEach(item => {
       //   item.check = true;
       // });
+    },
+    authorizationBtn() {
+      this.menuIds = this.ResourceArr.join(",");
+      if (this.menuIds == '' || this.roleId == '') {
+        this.$Message.warning('请先选择一个角色并分配权限后再试');
+        return;
+      };
+      this.authorization(this.menuIds);
+    },
+    authorization(menuIds) { //角色授权 api
+      this.$http.post('/api/role/authorization', {
+        roleId: this.roleId,
+        menuIds: menuIds,
+        mid: this.merchants[0].id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data);
+            this.findResourceByMid();
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        })
     },
     pushRolTabData_L() { //确定
       this.rolTabData_L.push(this.rolFormData_L);
@@ -367,6 +452,15 @@ section {
       }
       .checkbox {
         border-right: 1px solid #dfe6ec;
+      }
+    }
+    .saveRoleManger {
+      overflow: hidden;
+      >div:nth-child(1) {
+        float: left;
+      }
+      >button {
+        float: right;
       }
     }
   }

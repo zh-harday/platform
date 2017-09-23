@@ -2,7 +2,7 @@ import {
     Notification
 } from 'element-ui'
 // import request from 'superagent'
-import * as types from '../mutations-type'
+// import * as types from '../mutations-type'
 import loginBox from '../../components/loginBox.vue'
 import loginCard from '../../components/loginCard.vue'
 
@@ -11,6 +11,7 @@ const state = {
     userInfor: {}, //save user login infor
     merchants: [], //save 组织列表
     menus: [],
+    logged: {},
     logoSrc: {
         logo: '',
         merchantName: ''
@@ -47,6 +48,9 @@ const mutations = {
             path: state.TitleList[obj.index - 1].path
             // path: state.TitleList[obj.index - 1].name
         });
+    },
+    setLogged(state,isLogged){
+        state.logged.isLogged = isLogged;
     },
     pushUserInfor(state, data) {
         state.userInfor = data.userInfo; //push merchants(组织列表) 数据到state
@@ -89,6 +93,8 @@ const actions = {
             } else if (data.status == '200') { //登录成功
                 // this.$Message.success(res.data.message);
                 console.log(data.data);
+                commit('setLogged', '1');
+                window.sessionStorage.setItem('setLogged', JSON.stringify(state.logged));
                 commit('pushUserInfor', data.data.result);
                 window.sessionStorage.setItem('userInfor', JSON.stringify(state.userInfor));
                 console.log(state.userInfor);
