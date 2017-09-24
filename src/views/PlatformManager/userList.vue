@@ -171,13 +171,8 @@
 import { mapState } from 'vuex'
 export default {
   computed: {
-    ...mapState({
-      aaa(state) {
-        alert(555);
-      }
-    }),
     userId(state) {
-      alert(111);
+      alert(333);
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
       console.log(this.$store.state.login.merchants[0].um_id);
@@ -186,14 +181,15 @@ export default {
   },
   created() {
     // alert(111);
-    this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
-    this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
-    this.userInfor = this.$store.state.login.userInfor;
-    this.merchants = this.$store.state.login.merchants;
+    // this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
+    // this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
+    // this.userInfor = this.$store.state.login.userInfor;
+    // this.merchants = this.$store.state.login.merchants;
     // console.log(this.userInfor);
     // console.log(this.merchants);
     // console.log(this.$store.state.login.merchants);
     // this.queryRoleListByUM();
+    // console.log(this.userId)
     
     this.queryRoleListByUM('');
   },

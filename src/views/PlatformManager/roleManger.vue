@@ -84,7 +84,7 @@
                   </el-table-column>
                   <el-table-column width="398px" align="center">
                     <template scope="scope">
-                      <el-checkbox @change="handleSelectionChange2($event,scope.row)" :v-model="item.selected"></el-checkbox>
+                      <el-checkbox @change="handleSelectionChange2($event,scope.row)" v-model="item.selected"></el-checkbox>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -120,8 +120,7 @@ export default {
     // console.log(this.userInfor);
     // console.log(this.merchants);
     // console.log(this.$store.state.login.merchants);
-    this.queryRoleListByUM();
-    // this.findResourceByMid();
+    this.findResourceByMid();
   },
   mounted() {
     this.rolTabData_R.forEach(row => {
@@ -219,6 +218,7 @@ export default {
       })
         .then(res => {
           if (res.status == '200') {
+            this.queryRoleListByUM()
             console.log(res.data.result);
             this.menus = getNodes(res.data.result);
             console.log('***********************');
