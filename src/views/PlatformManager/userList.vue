@@ -310,8 +310,8 @@ export default {
       row.locked = !row.locked;
     },
     queryRoleListByUM() { //查询用户角色列表 api
-      // this.$http.post('/api/role/queryRoleListByUM', {
-      this.$http.post('/api/role/queryRoleList', {
+      // this.$http.post(this.api+'/role/queryRoleListByUM', {
+      this.$http.post(this.api+'/role/queryRoleList', {
         // umid: this.merchants[0].um_id
         merchantId: this.merchants[0].id
       })
@@ -329,7 +329,7 @@ export default {
         })
     },
     queryRoleListByUM(num) { //查询用户列表 api
-      this.$http.post('/api/user/queryUserByMid', {
+      this.$http.post(this.api+'/user/queryUserByMid', {
         // umid: this.merchants[0].um_id
         merchantId: this.merchants[0].id,
         "userName": this.userInfor.name,

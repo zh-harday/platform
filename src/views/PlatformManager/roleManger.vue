@@ -193,8 +193,8 @@ export default {
       console.log(this.ResourceArr);
     },
     queryRoleListByUM() { //查询用户角色列表
-      // this.$http.post('/api/role/queryRoleListByUM', {
-      this.$http.post('/api/role/queryRoleList', {
+      // this.$http.post(this.api+'/role/queryRoleListByUM', {
+      this.$http.post(this.api+'/role/queryRoleList', {
         // umid: this.merchants[0].um_id
         merchantId: this.merchants[0].id
       })
@@ -214,7 +214,7 @@ export default {
         })
     },
     findResourceByMid() { //查询企业权限列表
-      this.$http.post('/api/user/findResourceByMid', {
+      this.$http.post(this.api+'/user/findResourceByMid', {
         merchantId: this.merchants[0].id
       })
         .then(res => {
@@ -252,7 +252,7 @@ export default {
         })
     },
     saveRole() { //新增角色
-      this.$http.post('/api/role/saveRole', {
+      this.$http.post(this.api+'/role/saveRole', {
         "merchantId": this.merchants[0].id,
         "roleName": this.rolFormData_L.roleName,
       })
@@ -271,7 +271,7 @@ export default {
         })
     },
     deleteRole(id) { //删除角色
-      this.$http.post('/api/role/deleteRole', {
+      this.$http.post(this.api+'/role/deleteRole', {
         "roleId": id,
       })
         .then(res => {
@@ -289,7 +289,7 @@ export default {
         })
     },
     updateRole(roleName) { //编辑保存角色
-      this.$http.post('/api/role/updateRole', {
+      this.$http.post(this.api+'/role/updateRole', {
         "roleName": roleName,
         "merchantId": this.merchants[0].id
       })
@@ -312,7 +312,7 @@ export default {
         })
     },
     findResourceByRid(id) { //查询角色对应权限
-      this.$http.post('/api/role/findResourceByRid', {
+      this.$http.post(this.api+'/role/findResourceByRid', {
         "r_id": id
       })
         .then(res => {
@@ -370,7 +370,7 @@ export default {
       this.authorization(this.menuIds);
     },
     authorization(menuIds) { //角色授权 api
-      this.$http.post('/api/role/authorization', {
+      this.$http.post(this.api+'/role/authorization', {
         roleId: this.roleId,
         menuIds: menuIds,
         mid: this.merchants[0].id
