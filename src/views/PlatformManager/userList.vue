@@ -38,7 +38,7 @@
       </div>
       <!-- Add userListFormData Diglog  -->
       <el-dialog title="添加用户" :visible.sync="userListDialogFormVisible">
-        <el-form :model="userListFormData" ref="userListFormData" class="userListFormData">
+        <el-form label-position="left" :model="userListFormData" ref="userListFormData" class="userListFormData">
           <el-row :gutter="20">
             <el-col :span="24">
               <div class="grid-content bg-purple-dark">
@@ -119,7 +119,6 @@
           <el-button type="primary" @click="pushRolTabData_L">确 定</el-button>
         </div>
       </el-dialog>
-
       <el-row :gutter="20">
         <el-col :span="24">
           <div class="grid-content bg-purple-dark"></div>
@@ -155,10 +154,10 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template scope="scope">
-            <el-button :disabled="lockValue" v-if="!lockValue" @click="editUserListTabData(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
+            <el-button :disabled="locked" v-if="!lockValue" @click="editUserListTabData(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
             <el-button v-if="lockValue" @click="editUserListTabData(scope.$index,scope.row)" type="primary" size="small">保 存</el-button>
-            <el-button @click="checkLocking(scope.$index,scope.row)" type="primary" size="small">锁 定</el-button>
-            <el-button @click="checkLocking(scope.$index,scope.row)" type="primary" size="small">启 用</el-button>
+            <el-button :disabled="locked" @click="checkLocking(scope.$index,scope.row)" type="primary" size="small">锁 定</el-button>
+            <el-button :disabled="!locked" @click="checkLocking(scope.$index,scope.row)" type="primary" size="small">启 用</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -194,8 +193,11 @@ export default {
     // console.log(this.merchants);
     // console.log(this.$store.state.login.merchants);
     // this.queryRoleListByUM();
-    
+
     this.queryRoleListByUM('');
+    if (this.status == '所有' || this.status == '') {
+      this.locked == false;
+    };
   },
   data() {
     return {
@@ -258,20 +260,23 @@ export default {
           label: '女'
         },
       ],
-      formLabelWidth: '',
+      formLabelWidth: '120px',
       formSelectLabelWidth: 200,
     }
   },
   methods: {
-    selectValue(value){
+    selectValue(value) {
       console.log(value);
       this.queryRoleListByUM(value);
-      if(value == ''){
+      if (value == '') {
         this.types = '所有';
-      } else if( value == '1'){
+        this.locked == false;
+      } else if (value == '1') {
         this.types = '启用';
-      } else if( value == '0'){
+        this.locked == false;
+      } else if (value == '0') {
         this.types = '锁定';
+        this.locked == true;
       }
     },
     addTab() { //添加
@@ -289,7 +294,7 @@ export default {
         locked: false,
       };
       this.userListFormData = new_userListFormData;
-      this.queryRoleListByUM(); //查询角色列表
+      this.queryListByUM(); //查询角色列表
       this.userListDialogFormVisible = true;
     },
     pushRolTabData_L() { //确定
@@ -299,6 +304,7 @@ export default {
       this.userListDialogFormVisible = false;
     },
     editUserListTabData(index, row) { //编辑
+      this.userListDialogFormVisible = true;
       if (row.locked == false) {
         row.editFlag = !row.editFlag;
       }
@@ -307,19 +313,47 @@ export default {
     //   row.editFlag = false;
     // },
     checkLocking(index, row) { //锁定
-      row.locked = !row.locked;
+      // row.locked = !row.locked;
+      this.locked = !this.locked;
+      console.log(this.locked);
+      if (this.locked) { //锁定
+        this.lockUnlock(0);
+      } else { //启用
+        this.lockUnlock(1);
+      }
     },
-    queryRoleListByUM() { //查询用户角色列表 api
-      // this.$http.post('/api/role/queryRoleListByUM', {
-      this.$http.post('/api/role/queryRoleList', {
-        // umid: this.merchants[0].um_id
-        merchantId: this.merchants[0].id
+    lockUnlock(status) { //锁定/启用用户
+      this.$http.post('/api/user/lockUnlock', {
+        "umid": this.merchants[0].um_id,
+        "lockValue": status
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data.result);
-            this.roleList = res.data.result;
-            this.$Message.success(res.data.message);
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.$Message.success(res.data.message);
+            }
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          console.log('请求超时');
+        })
+    },
+    queryListByUM() { //查询用户角色列表 api
+      // this.$http.post('/api/role/queryRoleListByUM', {
+      this.$http.post('/api/role/queryRoleList', {
+        merchantId: this.merchants[0].id
+        // umid: this.merchants[0].um_id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              // console.log(res.data.result);
+              this.roleList = res.data.result;
+              this.$Message.success(res.data.message);
+            }
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
@@ -346,6 +380,26 @@ export default {
         })
         .catch(error => {
           this.$Message.error('请求超时');
+        })
+    },
+    queryUser() { //查询用户详情列表数据 api
+      this.$http.post('/api/user/queryUser', {
+        "userId": ""//用户id 必须
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
         })
     },
   }
@@ -377,6 +431,7 @@ section {
         height: 40px;
         line-height: 40px;
         background: #eff2f7;
+        margin-bottom: 20px;
       }
     }
   }
