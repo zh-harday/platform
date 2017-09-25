@@ -170,13 +170,8 @@
 import { mapState } from 'vuex'
 export default {
   computed: {
-    ...mapState({
-      aaa(state) {
-        alert(555);
-      }
-    }),
     userId(state) {
-      alert(111);
+      alert(333);
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
       console.log(this.$store.state.login.merchants[0].um_id);
@@ -185,15 +180,20 @@ export default {
   },
   created() {
     // alert(111);
-    this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
-    this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
-    this.userInfor = this.$store.state.login.userInfor;
-    this.merchants = this.$store.state.login.merchants;
+    // this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
+    // this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
+    // this.userInfor = this.$store.state.login.userInfor;
+    // this.merchants = this.$store.state.login.merchants;
     // console.log(this.userInfor);
     // console.log(this.merchants);
     // console.log(this.$store.state.login.merchants);
     // this.queryRoleListByUM();
+<<<<<<< HEAD
 
+=======
+    // console.log(this.userId)
+    
+>>>>>>> 3d972792b2c976945e48dbd1dea16d234885f93b
     this.queryRoleListByUM('');
     if (this.status == '所有' || this.status == '') {
       this.locked == false;
@@ -322,6 +322,7 @@ export default {
         this.lockUnlock(1);
       }
     },
+<<<<<<< HEAD
     lockUnlock(status) { //锁定/启用用户
       this.$http.post('/api/user/lockUnlock', {
         "umid": this.merchants[0].um_id,
@@ -344,6 +345,12 @@ export default {
     queryListByUM() { //查询用户角色列表 api
       // this.$http.post('/api/role/queryRoleListByUM', {
       this.$http.post('/api/role/queryRoleList', {
+=======
+    queryRoleListByUM() { //查询用户角色列表 api
+      // this.$http.post(this.api+'/role/queryRoleListByUM', {
+      this.$http.post(this.api+'/role/queryRoleList', {
+        // umid: this.merchants[0].um_id
+>>>>>>> 3d972792b2c976945e48dbd1dea16d234885f93b
         merchantId: this.merchants[0].id
         // umid: this.merchants[0].um_id
       })
@@ -363,7 +370,7 @@ export default {
         })
     },
     queryRoleListByUM(num) { //查询用户列表 api
-      this.$http.post('/api/user/queryUserByMid', {
+      this.$http.post(this.api+'/user/queryUserByMid', {
         // umid: this.merchants[0].um_id
         merchantId: this.merchants[0].id,
         "userName": this.userInfor.name,

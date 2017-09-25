@@ -193,7 +193,7 @@ export default {
     },
     methods: {
         sysMenuQueryList() { //查询功能菜单列表数据
-            this.$http.post('/api/sysMenu/queryList', {
+            this.$http.post(this.api+'/sysMenu/queryList', {
 
             })
                 .then(res => {
@@ -261,7 +261,7 @@ export default {
                 this.updateMenu();
                 return;
             };
-            this.$http.post('/api/sysMenu/save', {
+            this.$http.post(this.api+'/sysMenu/save', {
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
@@ -288,7 +288,7 @@ export default {
             this.dialogFormVisible1 = false;
         },
         updateMenu() { //修改菜单信息
-            this.$http.post('/api/sysMenu/update', {
+            this.$http.post(this.api+'/sysMenu/update', {
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
@@ -310,7 +310,7 @@ export default {
                 })
         },
         deleteById(item) { //删除菜单
-            this.$http.post('/api/sysMenu/deleteById', {
+            this.$http.post(this.api+'/sysMenu/deleteById', {
                 menuId: item.id
             })
                 .then(res => {
