@@ -14,7 +14,7 @@
         <el-row>
           <el-col :span="6" class="roleMang_tab_boder">
             <div class="grid-content bg-purple-dark">
-              <el-button @click="addTab" type="primary" size="small" class="addBtn">添加</el-button>
+              <el-button @click="addTabBtn" type="primary" size="small" class="addBtn">添加</el-button>
             </div>
           </el-col>
           <el-col :span="6" class="roleMang_tab_boder">
@@ -37,53 +37,51 @@
         </el-row>
       </div>
       <!-- Add userListFormData Diglog  -->
-      <el-dialog title="添加用户" :visible.sync="userListDialogFormVisible">
+      <el-dialog title="添加人员" :visible.sync="userListDialogFormVisible">
         <el-form label-position="left" :model="userListFormData" ref="userListFormData" class="userListFormData">
-          <el-row :gutter="20">
-            <el-col :span="24">
-              <div class="grid-content bg-purple-dark">
-                <el-form-item prop="addPeople" label="添加人员" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.addPeople" auto-complete="off"></el-input>
-                </el-form-item>
-              </div>
-            </el-col>
-          </el-row>
           <div class="inforBackg">基本信息</div>
           <el-row :gutter="20">
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="account" label="账号" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.account" auto-complete="off"></el-input>
+                <el-form-item prop="number" label="账号" :label-width="formLabelWidth">
+                  <el-input v-model="userListFormData.number" auto-complete="off"></el-input>
                 </el-form-item>
               </div>
             </el-col>
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="userName" label="姓名" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.userName" auto-complete="off"></el-input>
+                <el-form-item prop="name" label="姓名" :label-width="formLabelWidth">
+                  <el-input v-model="userListFormData.name" auto-complete="off"></el-input>
                 </el-form-item>
               </div>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row :gutter="20">
             <el-col :span="24">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="rolePeople" label="角色" :label-width="formLabelWidth">
-                  <el-select v-model="userListFormData.rolePeople" placeholder="请选择" size="120%">
-                    <el-option v-for="item in roleList" :key="item.roleName" :label="item.roleName" :value="item.id">
+                <el-form-item prop="roleName" label="角色" :label-width="formLabelWidth">
+                  <el-select @change="getRoleName" multiple v-model="userListFormData.roleName" placeholder="请选择" size="120%">
+                    <el-option v-for="item in roleList" :key="item.value" :label="item.roleName" :value="item.id">
                     </el-option>
                   </el-select>
                 </el-form-item>
               </div>
             </el-col>
+            <!-- <el-col :span="12">
+                            <div class="grid-content bg-purple-dark">
+                              <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
+                                <el-input v-model="userListFormData.pass" auto-complete="off"></el-input>
+                              </el-form-item>
+                            </div>
+                          </el-col> -->
           </el-row>
           <div class="inforBackg">个人信息</div>
           <el-row :gutter="20">
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="gender" label="性别" :label-width="formLabelWidth">
-                  <el-select v-model="userListFormData.gender" placeholder="请选择" size="100%">
-                    <el-option v-for="item in gender" :key="item.value" :label="item.label" :value="item.value">
+                <el-form-item prop="six" label="性别" :label-width="formLabelWidth">
+                  <el-select v-model="userListFormData.six" placeholder="请选择" size="100%">
+                    <el-option v-for="item in six" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -92,7 +90,8 @@
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
                 <el-form-item prop="birthday" label="生日" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.birthday" auto-complete="off"></el-input>
+                  <el-date-picker @change="getDateValue" v-model="userListFormData.birthday" auto-complete="off" type="date" placeholder="选择日期" size="large">
+                  </el-date-picker>
                 </el-form-item>
               </div>
             </el-col>
@@ -100,15 +99,15 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="phoneNumber" label="手机" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.phoneNumber" auto-complete="off"></el-input>
+                <el-form-item prop="phone" label="手机" :label-width="formLabelWidth">
+                  <el-input v-model="userListFormData.phone" auto-complete="off"></el-input>
                 </el-form-item>
               </div>
             </el-col>
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item prop="email" label="邮箱" :label-width="formLabelWidth">
-                  <el-input v-model="userListFormData.email" auto-complete="off"></el-input>
+                <el-form-item prop="emil" label="邮箱" :label-width="formLabelWidth">
+                  <el-input v-model="userListFormData.emil" auto-complete="off"></el-input>
                 </el-form-item>
               </div>
             </el-col>
@@ -116,7 +115,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="userListDialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="pushRolTabData_L">确 定</el-button>
+          <el-button type="primary" @click="editSaveUserListBtn">确 定</el-button>
         </div>
       </el-dialog>
       <el-row :gutter="20">
@@ -130,7 +129,7 @@
       <el-table border id="userListTabData" :data="userListTabData" style="width: 100%" ref="userListTabData">
         <el-table-column prop="userName" label="姓名" align="center">
           <template scope="scope">
-            <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.userName }}</span>
+            <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.name }}</span>
             <span v-if="scope.row.editFlag" class="cell-edit-input">
               <el-input v-model="scope.row.userName" placeholder=""></el-input>
             </span>
@@ -171,29 +170,13 @@ import { mapState } from 'vuex'
 export default {
   computed: {
     userId(state) {
-      alert(333);
+      // alert(333);
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
-      console.log(this.$store.state.login.merchants[0].um_id);
-      return this.$store.state.login.userInfor;
+      return this.$store.state.login.merchants;
     },
   },
   created() {
-    // alert(111);
-    // this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
-    // this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
-    // this.userInfor = this.$store.state.login.userInfor;
-    // this.merchants = this.$store.state.login.merchants;
-    // console.log(this.userInfor);
-    // console.log(this.merchants);
-    // console.log(this.$store.state.login.merchants);
-    // this.queryRoleListByUM();
-<<<<<<< HEAD
-
-=======
-    // console.log(this.userId)
-    
->>>>>>> 3d972792b2c976945e48dbd1dea16d234885f93b
     this.queryRoleListByUM('');
     if (this.status == '所有' || this.status == '') {
       this.locked == false;
@@ -201,6 +184,7 @@ export default {
   },
   data() {
     return {
+      add: false,
       roleList: [],
       userInfor: {}, //用户信息
       merchantId: '', //企业id
@@ -220,16 +204,17 @@ export default {
       }],
       userListTabData: [], //用户信息列表
       userListFormData: { //添加用户信息 form list
-        userName: "", //姓名
-        account: "", //账号
-        email: "", //邮箱
-        addPeople: "", //添加人员
-        rolePeople: "", //角色
-        gender: "", //性别
+        name: "", //姓名
+        number: "", //账号
+        emil: "", //邮箱
+        six: "", //性别
         birthday: "", //生日
-        phoneNumber: "", //手机
-        editFlag: false,
-        locked: false,
+        phone: "", //手机
+        roleIds: '',
+        roleName: [], //角色id
+        id: '', //用户 id
+        umId: '', //用户商户中间表id
+        pass: '123456', //用户密码
       },
       userListDialogFormVisible: false, //Diglog
       roleSelect: [{ //角色 selectList
@@ -250,13 +235,13 @@ export default {
       }],
       role: '',
       gender: '',
-      gender: [
+      six: [ //性别
         {
-          value: '0',
+          value: '1',
           label: '男'
         },
         {
-          value: '1',
+          value: '0',
           label: '女'
         },
       ],
@@ -279,35 +264,62 @@ export default {
         this.locked == true;
       }
     },
-    addTab() { //添加
+    addTabBtn() { //添加
       // alert(1);
+      this.add = true;
       let new_userListFormData = {
-        userName: "", //姓名
-        account: "", //账号
-        email: "", //邮箱
-        addPeople: "", //添加人员
-        rolePeople: "", //角色
-        gender: "", //性别
+        name: "", //姓名
+        number: "", //账号
+        emil: "", //邮箱
+        six: "", //性别
         birthday: "", //生日
-        phoneNumber: "", //手机
-        editFlag: false,
-        locked: false,
+        phone: "", //手机
+        roleIds: '',
+        id: '', //用户 id
+        umId: '', //用户商户中间表id
+        pass: '123456', //用户密码
+        roleName: '' //角色名称
       };
       this.userListFormData = new_userListFormData;
-      this.queryListByUM(); //查询角色列表
+      this.queryUserListByUM(); //查询企业角色列表
       this.userListDialogFormVisible = true;
     },
-    pushRolTabData_L() { //确定
-      this.userListTabData.push(this.userListFormData);
-      // console.log(this.userListFormData.rolePeople);
+    editSaveUserListBtn() { //确定
+      if (this.add) {
+        console.log(this.userListFormData);
+        this.saveUser();
+      } else {
+        alert('bj');
+        console.log(this.userListFormData);
+        for (let item in this.userListFormData) {
+          if (this.userListFormData.six == '女') {
+            this.userListFormData.six = '0';
+          } else {
+            this.userListFormData.six = '1';
+          }
+        };
+        this.updateUser();
+      };
+      console.log(this.userListFormData);
+      // this.updateUser();
       this.userListFormData = {};
       this.userListDialogFormVisible = false;
     },
+    getRoleName(value) {
+      // console.log(value);
+      this.userListFormData.roleName = value;
+    },
+    getDateValue(value) {
+      this.userListFormData.birthday = value;
+    },
     editUserListTabData(index, row) { //编辑
+      console.log(row);
+      this.add = false;
       this.userListDialogFormVisible = true;
-      if (row.locked == false) {
-        row.editFlag = !row.editFlag;
-      }
+      this.queryUser(row.id); //用户详情
+      this.queryUserListByUM(row.umId); //查询企业角色列表
+      // this.queryUserRoleList(row.umId); //查询用户拥有角色列表
+
     },
     // saveUserListTabData(index, row) { //保存
     //   row.editFlag = false;
@@ -322,43 +334,39 @@ export default {
         this.lockUnlock(1);
       }
     },
-<<<<<<< HEAD
-    lockUnlock(status) { //锁定/启用用户
-      this.$http.post('/api/user/lockUnlock', {
-        "umid": this.merchants[0].um_id,
-        "lockValue": status
+    lockUnlock(num) { //启用/锁定用户
+      this.$http.post(this.api + '/user/lockUnlock', {
+        "umid": this.userId[0].um_id,
+        "lockValue": num
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
               console.log(res.data);
+              this.queryUserListByUM();
               this.$Message.success(res.data.message);
             }
+
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
-          console.log('请求超时');
+          this.$Message.error("请求超时");
+          // console.log('请求超时');
         })
     },
-    queryListByUM() { //查询用户角色列表 api
-      // this.$http.post('/api/role/queryRoleListByUM', {
-      this.$http.post('/api/role/queryRoleList', {
-=======
-    queryRoleListByUM() { //查询用户角色列表 api
-      // this.$http.post(this.api+'/role/queryRoleListByUM', {
-      this.$http.post(this.api+'/role/queryRoleList', {
-        // umid: this.merchants[0].um_id
->>>>>>> 3d972792b2c976945e48dbd1dea16d234885f93b
-        merchantId: this.merchants[0].id
-        // umid: this.merchants[0].um_id
+    queryUserListByUM(umid) { //查询企业角色列表 api
+      this.$http.post(this.api + '/role/queryRoleList', {
+        merchantId: this.userId[0].id,
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
-              // console.log(res.data.result);
+              console.log('企业角色列表');
+              console.log(res.data.result);
               this.roleList = res.data.result;
+              this.queryUserRoleList(umid); //查询用户拥有角色列表
               this.$Message.success(res.data.message);
             }
           } else if (res.status == '403') {
@@ -369,17 +377,16 @@ export default {
           this.$Message.error('请求超时');
         })
     },
-    queryRoleListByUM(num) { //查询用户列表 api
-      this.$http.post(this.api+'/user/queryUserByMid', {
-        // umid: this.merchants[0].um_id
-        merchantId: this.merchants[0].id,
+    queryRoleListByUM(num) { //查询平台所有用户列表 api
+      this.$http.post(this.api + '/user/queryUserByMid', {
+        "merchantId": this.userId.id,
         "userName": this.userInfor.name,
         "lockValue": num,
       })
         .then(res => {
           if (res.status == '200') {
             console.log(res.data.result);
-            this.userListTabData = res.data.result;
+            this.userListTabData = res.data.result.list;
             this.$Message.success(res.data.message);
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
@@ -389,14 +396,57 @@ export default {
           this.$Message.error('请求超时');
         })
     },
-    queryUser() { //查询用户详情列表数据 api
-      this.$http.post('/api/user/queryUser', {
-        "userId": ""//用户id 必须
+    queryUserRoleList(umid) { //查询用户拥有角色列表 api
+      this.$http.post(this.api + '/role/queryRoleListByUM', {
+        umid: umid
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log('用户角色列表');
+            console.log(res.data.result);
+            for(let userRoleList in res.data.result){
+              this.roleList.push(res.data.result[userRoleList]);
+              console.log(userRoleList);
+            };
+            console.log('合并后数组');
+            console.log(this.roleList);
+            this.userListTabData = res.data.result.list;
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error('请求超时');
+        })
+    },
+    queryUser(id) { //查询用户详情列表数据 api
+      // this.$http.post(this.api + '/user/queryUser', {
+      this.$http.post(this.api + '/user/queryUserInfo', {
+        "userId": id
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
+              console.log('用户详情');
               console.log(res.data);
+              for (let item in res.data.result) {
+                if (res.data.result.six == '0') {
+                  res.data.result.six = '女';
+                } else {
+                  res.data.result.six = '男';
+                }
+                // this.userListFormData.pass = this.md5(res.data.result.pass, 32);
+              };
+              this.userListFormData.id = res.data.result.id;
+              this.userListFormData.umId = res.data.result.umId;
+              this.userListFormData.name = res.data.result.name;
+              this.userListFormData.number = res.data.result.number;
+              this.userListFormData.pass = res.data.result.pass;
+              this.userListFormData.birthday = res.data.result.birthday;
+              this.userListFormData.six = res.data.result.six;
+              this.userListFormData.phone = res.data.result.phone;
+              this.userListFormData.emil = res.data.result.emil;
               this.$Message.success(res.data.message);
             }
 
@@ -407,6 +457,63 @@ export default {
         .catch(error => {
           this.$Message.error("请求超时");
           console.log('请求超时');
+        })
+    },
+    updateUser() { //编辑保存用户信息
+      this.$http.post(this.api + '/user/updateUser', {
+        "id": this.userListFormData.id,
+        "umId": this.userListFormData.umId,
+        "name": this.userListFormData.name,
+        "number": this.userListFormData.number,
+        "pass": this.userListFormData.pass,
+        "birthday": this.userListFormData.birthday,
+        "six": this.userListFormData.six,
+        "phone": this.userListFormData.phone,
+        "emil": this.userListFormData.emil,
+        "roleIds": this.userListFormData.roleName
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.queryRoleListByUM('');
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        })
+    },
+    saveUser() { //保存新增用户信息
+      this.$http.post(this.api + '/user/saveUser', {
+        "mId": this.userId[0].id,
+        "name": this.userListFormData.name,
+        "number": this.userListFormData.number,
+        "pass": "123456",
+        "birthday": this.userListFormData.birthday,
+        "six": this.userListFormData.six,
+        "phone": this.userListFormData.phone,
+        "emil": this.userListFormData.emil,
+        "roleIds": this.userListFormData.roleName
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.queryRoleListByUM('');
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
         })
     },
   }

@@ -202,7 +202,7 @@ export default {
             console.log(res.data.result);
             this.rolTabData_L = res.data.result;
             this.$Message.success(res.data.message);
-            this.findResourceByMid(); //查询企业权限列表
+            // this.findResourceByMid(); //查询企业权限列表
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
@@ -223,22 +223,22 @@ export default {
             this.menus = getNodes(res.data.result);
             console.log('***********************');
             console.log(this.menus);
-            this.menus.forEach(function(ele, index) {
-              // alert(111);
-              let obj1 = {};
-              obj1.menuName = ele.menuName;
-              obj1.selected = false;
-              this.menusName.push(obj1);
-              if (item.children) {
-                ele.children.forEach(function(item, index) {
-                  alert(222);
-                  let obj2 = {};
-                  obj2.menuName = item.menuName;
-                  obj2.selected = false;
-                  this.menusName.children.push(obj2);
-                }, this);
-              }
-            }, this);
+            // this.menus.forEach(function(ele, index) {
+            //   // alert(111);
+            //   let obj1 = {};
+            //   obj1.menuName = ele.menuName;
+            //   obj1.selected = false;
+            //   this.menusName.push(obj1);
+            //   if (item.children) {
+            //     ele.children.forEach(function(item, index) {
+            //       alert(222);
+            //       let obj2 = {};
+            //       obj2.menuName = item.menuName;
+            //       obj2.selected = false;
+            //       this.menusName.children.push(obj2);
+            //     }, this);
+            //   }
+            // }, this);
             console.log('/****menusName*****/');
             console.log(this.menusName);
             console.log('/****menus*********/');

@@ -76,7 +76,6 @@ const actions = {
         state
     }, user) { //send login API
         // console.log(user);
-        // user.self.$http.post('/api/user/login', {
             user.self.$http.post(user.self.api + '/user/login', {
             // number: user.name,
             // pass: user.pwd
@@ -102,8 +101,8 @@ const actions = {
                 // console.log(data.data);
                 if (data.data.result.userInfo.isMerchant >= '1') { //有组织列表
                     // if (data.data.result.merchants.length == '1') { //只有一个组织
-                        if (data.data.result.merchants.length == '0') { //只有一个组织
-                        alert(1);
+                        if (data.data.result.merchants.length == '1') { //只有一个组织
+                        // alert(1);
                         commit('pushMerchants', data.data.result);
                         window.sessionStorage.setItem('merchants', JSON.stringify(state.merchants));
                         console.log(state.merchants);
