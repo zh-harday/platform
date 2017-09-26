@@ -29,10 +29,10 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                // target:'http://192.168.0.116:9092',//平台
-                target:'http://192.168.0.198:9092',//平台
+                // target:'http://192.168.0.191:9092',//平台
+                // target:'http://192.168.0.198:9092',//平台
                 // target: 'http://18f46963j4.iok.la',
-                // target:'http://192.168.0.117:9091',//系统
+                target:'http://192.168.0.131:9092',// 文军凡IP
                 // target:'http://100.64.33.181:9091',
                 // target:'http://zhqwjmw.eicp.net',
                 changeOrigin:true,
