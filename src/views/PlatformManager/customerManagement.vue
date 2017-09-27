@@ -217,14 +217,13 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="状态" align="center">
+        <el-table-column prop="disables" label="状态" align="center">
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template scope="scope">
-            <el-button v-if="!scope.row.editFlag" :disabled="scope.row.status == '锁定'" @click="Edit(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
-            <el-button v-if="scope.row.editFlag" @click="Edit(scope.$index,scope.row)" type="primary" size="small">保 存</el-button>
-            <el-button @click="locking(scope.$index,scope.row)" type="primary" size="small">锁 定</el-button>
-            <el-button @click="Enabled(scope.$index,scope.row)" type="primary" size="small">启 用</el-button>
+            <el-button :disabled="scope.row.disables =='锁定'" @click="EditBtn(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
+            <el-button @click="locking(scope.$index,scope.row,0)" type="primary" size="small">锁 定</el-button>
+            <el-button @click="locking(scope.$index,scope.row,1)" type="primary" size="small">启 用</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -251,9 +250,10 @@ export default {
   },
   data() {
     return {
+      a: 1,
       type: '',
       industrys: [], //行业列表
-      address: '', //上传文件地址
+      fileAddress: '', //上传文件地址
       options: [], //客户类型列表数据
       file: {}, //文件列表
       addCustomerTabData: [],
@@ -265,7 +265,7 @@ export default {
         expiryDate: '', //到期日期
         type: '', //类型
         status: '启用', //状态
-        url:'', //上传文件地址
+        url: '', //上传文件地址
         officeAddress: "", //办公地址
         companyEmail: "", //公司邮箱
         contactPerson: "", //联系人
@@ -288,7 +288,7 @@ export default {
     NewObj() {
     },
     submitForm(event) { //提交上传文件到服务器
-      alert(5656);
+      // alert(5656);
       event.preventDefault();
       let formData = new FormData();
       // formData.append('file', this.file);
@@ -304,12 +304,14 @@ export default {
         .then(function(res) {
           if (res.status == '200') {
             if (res.data.status == '200') {
+              alert(2323);
               console.log(res.data.message);
               // let url = res.data.message;
-              this.address = res.data.message;
-              console.log(this.address);
-              this.address = res.data.message;
-              this.addCustomerFormData.url = this.url;
+              this.fileAddress = res.data.message;
+              // this.address = url;
+              // console.log(url);
+              console.log(this.a);
+              console.log(this.fileAddress);
               this.$Message.success(res.data.message);
             }
           }
@@ -335,33 +337,95 @@ export default {
       return value;
     },
     addCustomer() { //Add 新客户
-
       this.queryList();
       this.industryS();
       // this.addCustomerFormData = new_addCustomerFormData;
       this.addCustomerDialogFormVisible = true;
     },
     saveCustomerDialogForm() { //保存新增客户列表
-      this.addCustomerTabData.push(this.addCustomerFormData);
       this.addCustomerFormData = {};
       // this.$refs.addCustomerFormData.resetFields();
       this.addCustomerDialogFormVisible = false;
     },
-    Edit(index, row) { //编辑  
-      row.editFlag = !row.editFlag;
+    EditBtn(index, row) { //编辑  
+      console.log(row);
+      this.queryList();
+      this.industryS();
+      this.queryObject(row.id);
+      this.addCustomerDialogFormVisible = true;
     },
-    locking(index, row) { //锁定
+    locking(index, row,num) { //锁定
       row.status = "锁定";
-    },
-    Enabled(index, row) { //启用
-      row.status = '启用';
+      if(num == '0'){ //锁定
+        this.enableOrLock(row.id,num);
+      } else { //启用
+        this.enableOrLock(row.id,num);
+      }
     },
     saveCustomerDialogFormBtn() { //新增客户按钮
       console.log(this.addCustomerFormData);
+      this.editMerchant();
+      this.addCustomerDialogFormVisible = false;
     },
     getIndustryValue(value) { //获取行业数据
-    console.log(value);
+      console.log(value);
       this.addCustomerFormData.industry = value;
+    },
+    enableOrLock(id,type) { //锁定/启用 客户
+      this.$http.post(this.api + '/merchant/enableOrLock', {
+        "id": id,
+        "disables": type
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.queryInfo();
+              this.$Message.success(res.data.message);
+            }
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    },
+    queryObject(id) { //查询客户详情 api
+      this.$http.post(this.api + '/merchant/queryObject', {
+        merchantId: id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.addCustomerFormData.clientName = res.data.result.merchantName; //公司名称
+              this.addCustomerFormData.account = res.data.result.contactPhone; //账号
+              this.addCustomerFormData.openDate = res.data.result.startTime; //开通时间
+              this.addCustomerFormData.expiryDate = res.data.result.endTime; //结束时间
+              this.file.name = res.data.result.merchantFlie; //结束时间
+
+              this.addCustomerFormData.officeAddress = res.data.result.officeAddress; //办公地址
+              this.addCustomerFormData.companyEmail = res.data.result.email; //公司邮箱
+
+              this.addCustomerFormData.contactPerson = res.data.result.contactUser; //联系人
+              this.addCustomerFormData.contactPhone = res.data.result.contactPhone; //联系电话
+              // this.type = res.data.result.merchantTypeId; //类型
+              // this.addCustomerFormData.industry = res.data.result.industry; //行业
+              this.addCustomerFormData.remarks = res.data.result.info; //备注
+              this.addCustomerFormData.uscc = res.data.result.socialCode; //统一社会信用代码
+              this.addCustomerFormData.legalRepresen = res.data.result.representative; //法人代表
+              this.addCustomerFormData.address = res.data.result.address; //详细地址
+              this.$Message.success(res.data.message);
+            }
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        })
     },
     queryInfo() { //查询客户列表数据 api
       this.$http.post(this.api + '/merchant/queryInfo', {})
@@ -370,14 +434,10 @@ export default {
             if (res.data.status == '200') {
               console.log(res.data);
               res.data.result.list.forEach(function(item, index) {
-                if (item.type == '0') {
-                  item.type = '审核中';
-                } else if (item.type == '1') {
-                  item.type = '审核通过';
-                } else if (item.type == '2') {
-                  item.type = '审核失败';
-                } else if (item.type == '3') {
-                  item.type = '注册';
+                if (item.disables == '0') {
+                  item.disables = '锁定';
+                } else if (item.disables == '1') {
+                  item.disables = '启用';
                 }
               }, this);
               this.addCustomerTabData = res.data.result.list;
@@ -428,18 +488,18 @@ export default {
     },
     editMerchant() { //新增客户 api
       this.$http.post(this.api + '/merchant/editMerchant', {
-        "merchantName": "平台开户测试", //客户名称
-        "startTime": "2017-09-06",  //开通i时间
-        "endTime": "2018-09-06", //到期时间
-        "industry": "11", //行业id
-        "contactUser": "hehe", //联系人
-        "contactPhone": "18792406090", //电话
-        "merchantTypeId": "2", //企业开通类型
-        "merchantFlie": "http://baidu.com", //文件
-        "info": "平台开户测试info", //备注
-        "socialCode": "444-555-6666", //社会编码
-        "representative": "平台开户测试法人", //法人代表
-        "address": "平台开户测试详细地址" //详细地址
+        "merchantName": this.addCustomerFormData.clientName,
+        "startTime": this.addCustomerFormData.openDate,
+        "endTime": this.addCustomerFormData.expiryDate,
+        "industry": this.addCustomerFormData.industry,
+        "contactUser": this.addCustomerFormData.contactPerson,
+        "contactPhone": this.addCustomerFormData.contactPhone,
+        "merchantTypeId": this.addCustomerFormData.type,
+        "merchantFlie": 'http://47.90.120.190:8086/group1/M00/00/02/rB9VtFnLB_SARAm5ABA0syEEsfE400.png',
+        "info": this.addCustomerFormData.remarks,
+        "socialCode": this.addCustomerFormData.uscc,
+        "representative": this.addCustomerFormData.legalRepresen,
+        "address": this.addCustomerFormData.address,
       })
         .then(res => {
           if (res.status == '200') {
@@ -447,8 +507,7 @@ export default {
               console.log(res.data);
               this.$Message.success(res.data.message);
             }
-
-          } else if (res.status == '403') {
+          } else if (res.data.status == '403') {
             this.$Message.error(res.data.message);
           }
         })

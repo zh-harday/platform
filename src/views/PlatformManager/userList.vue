@@ -129,7 +129,7 @@
       <el-table border id="userListTabData" :data="userListTabData" style="width: 100%" ref="userListTabData">
         <el-table-column prop="userName" label="姓名" align="center">
           <template scope="scope">
-            <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.name }}</span>
+            <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.userName }}</span>
             <span v-if="scope.row.editFlag" class="cell-edit-input">
               <el-input v-model="scope.row.userName" placeholder=""></el-input>
             </span>
@@ -173,10 +173,15 @@ export default {
       // alert(333);
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
-      return this.$store.state.login.merchants;
+      return {
+        userInfor : this.$store.state.login.userInfor,
+        merchants : this.$store.state.login.merchants
+      }
     },
   },
   created() {
+    console.log(this.userId.merchants[0].id);
+    console.log(this.userId.userInfor.name);
     this.queryRoleListByUM('');
     if (this.status == '所有' || this.status == '') {
       this.locked == false;
@@ -379,16 +384,16 @@ export default {
     },
     queryRoleListByUM(num) { //查询平台所有用户列表 api
       this.$http.post(this.api + '/user/queryUserByMid', {
-        "merchantId": this.userId.id,
-        "userName": this.userInfor.name,
+        "merchantId": this.userId.merchants[0].id,
+        "userName": this.userId.userInfor.name,
         "lockValue": num,
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data.result);
-            this.userListTabData = res.data.result.list;
+            console.log(res.data);
+            this.userListTabData = res.data.result;
             this.$Message.success(res.data.message);
-          } else if (res.status == '403') {
+          } else if (res.data.status == '403') {
             this.$Message.error(res.data.message);
           }
         })

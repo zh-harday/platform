@@ -1,11 +1,11 @@
 <template>
   <section>
-    <!-- 这是领头助手页面 -->
+    <!-- 这是云项目页面 -->
     <div>
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="" icon="search" v-model="input2" :on-icon-click="handleIconClick">
+            <el-input placeholder="请按项目名称/行业/轮次/项目所在地搜索" icon="search" v-model="input2" :on-icon-click="handleIconClick">
             </el-input>
           </div>
         </el-col>
@@ -281,29 +281,28 @@
       </el-dialog>
       <!-- 团队成员 Dialig Eng -->
       <el-table :data="leadTabData" border style="width: 100%">
-        <el-table-column :fixed="left" prop="projectName" label="项目名称" width="220" align="center">
+        <el-table-column :fixed="left" prop="name" label="项目名称" width="220" align="center">
         </el-table-column>
-        <el-table-column prop="industry" label="行业" width="200" align="center">
+        <el-table-column prop="industryName" label="行业" width="200" align="center">
         </el-table-column>
-        <el-table-column prop="rounds" label="轮次" width="200" align="center">
+        <el-table-column prop="phase" label="轮次" width="200" align="center">
         </el-table-column>
         <el-table-column prop="lastCast" label="上轮获投" width="200" align="center">
         </el-table-column>
-        <el-table-column prop="location" label="所在地" width="200" align="center">
+        <el-table-column prop="cityStr" label="所在地" width="200" align="center">
         </el-table-column>
-        <el-table-column prop="established" label="成立时间" width="200" align="center">
+        <el-table-column prop="startDate" label="成立时间" width="200" align="center">
         </el-table-column>
         <!-- <el-table-column prop="numberAdditions" label="加入次数" width="150" align="center">
-        </el-table-column> -->
+                  </el-table-column> -->
         <el-table-column prop="status" label="状态" width="200" align="center">
         </el-table-column>
         <!-- <el-table-column prop="sharesNumber" label="分享次数" width="150" align="center">
-        </el-table-column> -->
+                  </el-table-column> -->
         <el-table-column :fixed="right" label="操作" width="250" align="center">
           <template scope="scope">
             <el-button @click="hideRow(scope.$index,scope.row)" type="primary" size="small">隐 藏</el-button>
             <el-button @click="showRow(scope.$index,scope.row)" type="primary" size="small">显 示</el-button>
-            <el-button @click.native.prevent="removeRow(scope.$index, leadTabData)" type="primary" size="small">删 除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -313,6 +312,19 @@
 
 <script>
 export default {
+  computed: {
+    user() {
+      this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
+      this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
+      return {
+        merchants: this.$store.state.login.merchants,
+        userInfor: this.$store.state.login.userInfor
+      }
+    }
+  },
+  created(){
+    this.selectCompany();
+  },
   data() {
     return {
       leadTabData: [], //Tab
@@ -350,7 +362,7 @@ export default {
         position: "", //职位
         introduction: "" //介绍
       },
-      businessInformationList:{ //工商信息 Form
+      businessInformationList: { //工商信息 Form
         name: "", //公司名称
         type: "", //公司类型
         startDate: "", //成立日期
@@ -412,14 +424,45 @@ export default {
         this.teamListForm = {};
       }
     },
-    hideRow(index,row){
+    hideRow(index, row) {
       row.status = '隐藏';
     },
-    showRow(index,row){
+    showRow(index, row) {
       row.status = '显示';
     },
-    removeRow(index, rows){
+    removeRow(index, rows) {
       rows.splice(index, 1);
+    },
+    selectCompany(name, industry, phase, citystr) { //查询平台云项目列表数据
+      this.$http.post(this.api + '/CompanyClieController/selectCompany', {
+        "name": name,
+        "industry": industry,
+        "phase": phase,
+        "citystr": citystr
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              res.data.result.list.forEach( item => {
+                if(item.status == '0'){
+                  item.status = '';
+                } else if(item.status == '1'){
+                  item.status = '';
+                }
+              },this);
+              this.leadTabData = res.data.result.list;
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
     },
   }
 }

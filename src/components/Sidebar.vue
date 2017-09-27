@@ -71,7 +71,7 @@ export default {
             title30: '消息公告',
             title31: '客户管理',
             title32: '客户权限',
-            title33: '领头助手',
+            title33: '云项目',
             title34: '会员管理',
 
         }

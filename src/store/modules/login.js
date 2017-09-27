@@ -79,7 +79,9 @@ const actions = {
             user.self.$http.post(user.self.api + '/user/login', {
             // number: user.name,
             // pass: user.pwd
-            number: "13500000007",
+            // number: "13500000007",
+            // pass: "e10adc3949ba59abbe56e057f20f883e"
+            number: "15811026271",
             pass: "e10adc3949ba59abbe56e057f20f883e"
         }).then(data => {
             // alert(1);
