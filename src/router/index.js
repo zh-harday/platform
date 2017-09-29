@@ -12,7 +12,8 @@ let arr = [];
 arr = arr.concat(r2)
 
 const router = new Router({
-    mode: 'history',
+    // mode: 'history',
+    mode: 'hash',
     routes: [
         {
             path: '/',

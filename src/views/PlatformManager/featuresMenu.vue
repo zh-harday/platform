@@ -31,6 +31,7 @@
                 <el-col :span="4">
                 </el-col>
                 <el-col :span="4">
+
                 </el-col>
                 <el-col :span="4">
                 </el-col>
@@ -87,9 +88,11 @@
                         <el-table-column prop="operating" label="" align="center">
                             <template scope="scope">
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(scope.row)">
-                                    <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                    <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
+                                </el-button>
                                 <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row)">
-                                    <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                    <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
+                                </el-button>
                                 <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.$index, item.children)">
                                     <Icon size="20" type="trash-a"></Icon>
                                 </el-button>
@@ -117,24 +120,6 @@
                             </div>
                         </el-col>
                     </el-row>
-                    <!-- <el-row :gutter="20">
-                                                    <el-col :span="12">
-                                                        <div class="grid-content bg-purple-dark">
-                                                            <el-form-item label="创建日期" prop="creatDate" :label-width="addFormLabelWidth">
-                                                                <el-date-picker @change="getDate" v-model="addMenusFormData.creatDate" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
-                                                                </el-date-picker>
-                                                            </el-form-item>
-                                                        </div>
-                                                    </el-col>
-                                                    <el-col :span="12">
-                                                        <div class="grid-content bg-purple-dark">
-                                                            <el-form-item label="修改日期" prop="versionRecord" :label-width="addFormLabelWidth">
-                                                                <el-date-picker @change="getDate" v-model="addMenusFormData.versionRecord" type="datetime" placeholder="选择日期时间" style="width:100%" auto-complete="off">
-                                                                </el-date-picker>
-                                                            </el-form-item>
-                                                        </div>
-                                                    </el-col>
-                                                </el-row> -->
                     <el-row :gutter="20">
                         <el-col :span="24">
                             <div class="grid-content bg-purple-dark">
@@ -193,7 +178,7 @@ export default {
     },
     methods: {
         sysMenuQueryList() { //查询功能菜单列表数据
-            this.$http.post(this.api+'/sysMenu/queryList', {
+            this.$http.post(this.api + '/sysMenu/queryList', {
 
             })
                 .then(res => {
@@ -261,7 +246,7 @@ export default {
                 this.updateMenu();
                 return;
             };
-            this.$http.post(this.api+'/sysMenu/save', {
+            this.$http.post(this.api + '/sysMenu/save', {
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
@@ -288,7 +273,7 @@ export default {
             this.dialogFormVisible1 = false;
         },
         updateMenu() { //修改菜单信息
-            this.$http.post(this.api+'/sysMenu/update', {
+            this.$http.post(this.api + '/sysMenu/update', {
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
@@ -310,7 +295,7 @@ export default {
                 })
         },
         deleteById(item) { //删除菜单
-            this.$http.post(this.api+'/sysMenu/deleteById', {
+            this.$http.post(this.api + '/sysMenu/deleteById', {
                 menuId: item.id
             })
                 .then(res => {

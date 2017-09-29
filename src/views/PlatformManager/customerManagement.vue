@@ -222,8 +222,8 @@
         <el-table-column label="操作" align="center">
           <template scope="scope">
             <el-button :disabled="scope.row.disables =='锁定'" @click="EditBtn(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
-            <el-button @click="locking(scope.$index,scope.row,0)" type="primary" size="small">锁 定</el-button>
-            <el-button @click="locking(scope.$index,scope.row,1)" type="primary" size="small">启 用</el-button>
+            <el-button :disabled="scope.row.disables =='锁定'" @click="locking(scope.$index,scope.row,0)" type="primary" size="small">锁 定</el-button>
+            <el-button :disabled="scope.row.disables =='启用'" @click="locking(scope.$index,scope.row,1)" type="primary" size="small">启 用</el-button>
           </template>
         </el-table-column>
       </el-table>

@@ -49,7 +49,7 @@ const mutations = {
             // path: state.TitleList[obj.index - 1].name
         });
     },
-    setLogged(state,isLogged){
+    setLogged(state, isLogged) {
         state.logged.isLogged = isLogged;
     },
     pushUserInfor(state, data) {
@@ -76,13 +76,13 @@ const actions = {
         state
     }, user) { //send login API
         // console.log(user);
-            user.self.$http.post(user.self.api + '/user/login', {
+        user.self.$http.post(user.self.api + '/user/login', {
             // number: user.name,
             // pass: user.pwd
-            // number: "13500000007",
-            // pass: "e10adc3949ba59abbe56e057f20f883e"
-            number: "15811026271",
+            number: "13500000007",
             pass: "e10adc3949ba59abbe56e057f20f883e"
+            // number: "15811026271",
+            // pass: "e10adc3949ba59abbe56e057f20f883e"
         }).then(data => {
             // alert(1);
             if (data.status == '403') {
@@ -102,8 +102,7 @@ const actions = {
                 console.log(state.userInfor);
                 // console.log(data.data);
                 if (data.data.result.userInfo.isMerchant >= '1') { //有组织列表
-                    // if (data.data.result.merchants.length == '1') { //只有一个组织
-                        if (data.data.result.merchants.length == '1') { //只有一个组织
+                    if (data.data.result.merchants.length == '1') { //只有一个组织
                         // alert(1);
                         commit('pushMerchants', data.data.result);
                         window.sessionStorage.setItem('merchants', JSON.stringify(state.merchants));
@@ -116,15 +115,25 @@ const actions = {
                             message: '登录成功',
                             type: 'success'
                         });
-                    }
+                    } else if (data.data.result.merchants.length == '0') {
+                        commit('Notification', {
+                            title: '',
+                            message: '无组织列表',
+                            type: 'warning'
+                        });
+                        return;
+                    };
                 } else if (state.merchants.length > '1') { //有多个组织列表
-                    // state.CardBox = loginBox;
+                    state.CardBox = loginBox;
                     console.log(data.data);
 
                 } else if (data.data.result.userInfo.isMerchant == '0') { //无组织(不存在这种情况)
-                    user.self.$router.push({
-                        name: 'homeContent'
+                    commit('Notification', {
+                        title: '',
+                        message: '无关联组织',
+                        type: 'warning'
                     });
+                    return;
                 }
             }
         }).catch(error => {

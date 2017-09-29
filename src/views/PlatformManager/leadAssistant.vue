@@ -5,7 +5,7 @@
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="请按项目名称/行业/轮次/项目所在地搜索" icon="search" v-model="input2" :on-icon-click="handleIconClick">
+            <el-input placeholder="请按项目名称/行业/轮次/项目所在地搜索" select-when-unmatched="true" icon="search" v-model="input2" :on-icon-click="searchHandling">
             </el-input>
           </div>
         </el-col>
@@ -19,93 +19,107 @@
         </el-col>
       </el-row>
       <!-- 添加领头助手 Dialog Start-->
-      <el-dialog title="添加人员" :visible.sync="leaderAssistantFormDialog" :close-on-click-modal="false">
-        <el-form :model="leadFormData" :label-position="leaderAssistantFormDialog_align">
+      <el-dialog title="添加项目" :visible.sync="leaderAssistantFormDialog" :close-on-click-modal="false">
+        <el-form :model="company" :data="company" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
-            <!-- <el-col :span="24" class="formTitle">基本信息</el-col> -->
+            <el-col :span="24" class="subscriber">基本信息</el-col>
             <el-col :span="8">
-              <el-form-item label="项目名称" prop="projectName" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.projectName"></el-input>
+              <el-form-item label="项目名称" prop="name" :label-width="formLabelWidth">
+                <el-input placeholder="" v-model="company.name"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="行业" prop="industry" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.industry"></el-input>
+                <el-select v-model="company.industry" placeholder="请选择">
+                  <el-option v-for="item in industry" :key="item.value" :label="item.dicName" :value="item.id">
+                  </el-option>
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="轮次" prop="rounds" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.rounds"></el-input>
+              <el-form-item label="轮次" prop="phase" :label-width="formLabelWidth">
+                <el-input placeholder="" v-model="company.phase"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="上轮获投" prop="lastCast" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.lastCast"></el-input>
-              </el-form-item>
-            </el-col>
-            <!-- <el-col :span="24" class="formTitle">个人信息</el-col> -->
-            <el-col :span="8">
-              <el-form-item label="所在地" prop="location" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.location"></el-input>
+                <el-input placeholder="" v-model="company.lastCast"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="成立时间" prop="established" :label-width="formLabelWidth">
-                <el-input placeholder="" v-model="leadFormData.established"></el-input>
+              <el-form-item label="所在地" prop="city" :label-width="formLabelWidth">
+                <el-select v-model="company.city" placeholder="请选择">
+                  <el-option v-for="item in city" :key="item.value" :label="item.dicName" :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="成立时间" prop="startdate" :label-width="formLabelWidth">
+                <el-date-picker @change="getDate1" v-model="company.startdate" align="right" type="date" placeholder="选择日期">
+                </el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
           <!-- 项目介绍 Form Start -->
         </el-form>
-        <el-form :model="projectIntroduction" ref="projectIntroduction" :label-position="leaderAssistantFormDialog_align">
+        <el-form :model="productInfo" ref="productInfo" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
             <el-col :span="24" class="subscriber">项目介绍</el-col>
             <el-col :span="24">
-              <el-form-item porp="oerview" label="概述" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.oerview">
+              <el-form-item porp="brief" label="概述" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.brief">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item porp="detailedDescription" label="详细介绍" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.detailedDescription">
+              <el-form-item porp="intro" label="详细介绍" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.intro">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item porp="productService" label="产品服务" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.productService">
+              <el-form-item porp="productservice" label="产品服务" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.productservice">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item porp="userMarket" label="用户市场" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.userMarket">
+              <el-form-item porp="usermarket" label="用户市场" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.usermarket">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item porp="businessModel" label="商业模式" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.businessModel">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.businessModel">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item porp="operationalData" label="运营数据" :label-width="formLabelWidth">
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="projectIntroduction.operationalData">
+              <el-form-item porp="OperationData" label="运营数据" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="productInfo.OperationData">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item porp="businessProposal" label="商业计划书" :label-width="formLabelWidth">
-                <el-upload class="upload-demo" drag action="https://jsonplaceholder.typicode.com/posts/" multiple>
-                  <i class="el-icon-upload"></i>
-                  <div class="el-upload__text">将文件拖到此处，或
-                    <em>点击上传</em>
+              <div class="grid-content bg-purple-dark">
+                <el-form-item prop="businessPlan" label="相关文档" :label-width="formLabelWidth">
+                  <div>
+                    <div class="el-upload__text">
+                      <span @click="getFile($event)">
+                        <Icon type="upload" size=100></Icon>
+                      </span>
+                      <form>
+                        <input type="file" style="display:none" @change="changeImage($event)" ref="avatarInput">
+                        <button @click="submitForm($event)" class="cursor">点击上传</button>
+                        <span>{{file.name}}</span>
+                      </form>
+                      <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过10M</div>
+                    </div>
                   </div>
-                  <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-                </el-upload>
-              </el-form-item>
+                </el-form-item>
+              </div>
             </el-col>
           </el-row>
         </el-form>
@@ -114,18 +128,18 @@
         <el-row :gutter="20">
           <!-- <el-col :span="24" class="formTitle">基本信息</el-col> -->
           <el-col :span="24" class="subscriber">
-            融资经历
+            <div>融资经历</div>
             <el-button @click="addLeaderAssistantForm(2)" size="small" type="primary">添加</el-button>
           </el-col>
           <el-col :span="24">
-            <el-table align="center" :data="financingExperienceTab" ref="financingExperienceTab" border style="width: 100%">
+            <el-table align="center" :data="finance" ref="finance" border style="width: 100%">
               <el-table-column prop="date" label="时间" align="center">
               </el-table-column>
-              <el-table-column prop="rounds" label="轮次" align="center">
+              <el-table-column prop="phase" label="轮次" align="center">
               </el-table-column>
-              <el-table-column prop="AmountFinan" label="融资金额" align="center">
+              <el-table-column prop="financeamount" label="融资金额" align="center">
               </el-table-column>
-              <el-table-column prop="investor" label="投资方" align="center">
+              <el-table-column prop="investment" label="投资方" align="center">
               </el-table-column>
             </el-table>
           </el-col>
@@ -133,7 +147,6 @@
         <!-- 融资经历 Tab End -->
         <!-- 创始团队 Tab Start -->
         <el-row :gutter="20">
-          <!-- <el-col :span="24" class="formTitle">基本信息</el-col> -->
           <el-col :span="24" class="subscriber">
             <div>创始团队</div>
             <el-button @click="addLeaderAssistantForm(3)" size="small" type="primary">添加</el-button>
@@ -144,72 +157,76 @@
           </el-col>
           <el-col :span="22">
             <div>
-              <el-input type="textarea" autosize placeholder="请输入内容" v-model="textarea2">
+              <el-input @blur="storyBlur" type="textarea" autosize placeholder="请输入内容" v-model="story">
               </el-input>
             </div>
           </el-col>
           <el-col :span="24">
             <div class="teamMember">
               <div class="fl">团队成员</div>
-              <div class="fl" v-for="(item, index) in teamListTab" :key="item.name">
+              <div class="fl" v-for="(item, index) in teamintro" :key="item.name">
                 <span>{{item.name}}</span>
               </div>
             </div>
           </el-col>
           <!-- </el-row> -->
           <el-col :span="24">
-            <el-table align="center" :data="teamListTab" ref="teamListTab" border style="width: 100%">
+            <el-table align="center" :data="teamintro" ref="teamListTab" border style="width: 100%">
               <el-table-column prop="name" label="姓名" align="center">
               </el-table-column>
               <el-table-column prop="position" label="职位" align="center">
               </el-table-column>
-              <el-table-column prop="introduction" label="介绍" align="center">
+              <el-table-column prop="intro" label="介绍" align="center">
               </el-table-column>
             </el-table>
           </el-col>
         </el-row>
         <!-- 创始团队 Tab End -->
         <!-- 工商信息 Form Start -->
-        <el-form style="margin-top: 15px;" :model="businessInformationList" ref="BusinessInformationList" :label-position="leaderAssistantFormDialog_align">
+        <el-form style="margin-top: 15px;" :model="basicInfo" ref="basicInfo" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
+            <el-col :span="24" class="subscriber">
+              <div>工商信息</div>
+            </el-col>
             <el-col :span="12">
               <el-form-item label="公司名称" porp="name" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.name" auto-complete="off"></el-input>
+                <el-input v-model="basicInfo.name" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="公司类型" porp="type" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.type" auto-complete="off"></el-input>
+              <el-form-item label="公司类型" porp="conpanyType" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.conpanyType" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="成立日期" porp="startDate" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.startDate" auto-complete="off"></el-input>
+              <el-form-item label="成立日期" porp="startdate" :label-width="formLabelWidth">
+                <el-date-picker @change="getDate2" v-model="basicInfo.startdate" align="right" type="date" placeholder="选择日期">
+                </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="注册资本" porp="registered" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.registered" auto-complete="off"></el-input>
+              <el-form-item label="注册资本" porp="registcapi" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.registcapi" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="法人代表" porp="representative" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.representative" auto-complete="off"></el-input>
+              <el-form-item label="法人代表" porp="opername" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.opername" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="经营状态" porp="operatingStart" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.operatingStart" auto-complete="off"></el-input>
+              <el-form-item label="经营状态" porp="managementForms" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.managementForms" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="登记机关" porp="registration" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.registration" auto-complete="off"></el-input>
+              <el-form-item label="登记机关" porp="registrationAuthority" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.registrationAuthority" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="注册地址" porp="registraAddress" :label-width="formLabelWidth">
-                <el-input v-model="businessInformationList.registraAddress" auto-complete="off"></el-input>
+              <el-form-item label="注册地址" porp="registAddress" :label-width="formLabelWidth">
+                <el-input v-model="basicInfo.registAddress" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -223,26 +240,27 @@
       <!-- 添加领头助手 Dialog End-->
       <!-- 添加融资经历 Dialog Start -->
       <el-dialog title="添加" :visible.sync="financingDialogFormVisible">
-        <el-form :model="financingExperienceForm" ref="financingExperienceForm" :label-position="leaderAssistantFormDialog_align">
+        <el-form :model="financeF" ref="financeF" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="时间" porp="date" :label-width="formLabelWidth">
-                <el-input v-model="financingExperienceForm.date" auto-complete="off"></el-input>
+                <el-date-picker @change="getDate3" v-model="financeF.date" align="right" type="date" placeholder="选择日期" :picker-options="pickerOptions1">
+                </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="轮次" porp="rounds" :label-width="formLabelWidth">
-                <el-input v-model="financingExperienceForm.rounds" auto-complete="off"></el-input>
+              <el-form-item label="轮次" porp="phase" :label-width="formLabelWidth">
+                <el-input v-model="financeF.phase" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="融资金额" porp="AmountFinan" :label-width="formLabelWidth">
-                <el-input v-model="financingExperienceForm.AmountFinan" auto-complete="off"></el-input>
+              <el-form-item label="融资金额" porp="financeamount" :label-width="formLabelWidth">
+                <el-input v-model="financeF.financeamount" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="投资方" porp="investor" :label-width="formLabelWidth">
-                <el-input v-model="financingExperienceForm.investor" auto-complete="off"></el-input>
+              <el-form-item label="投资方" porp="investment" :label-width="formLabelWidth">
+                <el-input placeholder='多个投资方请用 "," 隔开' v-model="financeF.investment" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -255,21 +273,21 @@
       <!-- 添加融资经历 Dialog End -->
       <!-- 团队成员 Dialog Start -->
       <el-dialog title="添加" :visible.sync="AddTeamDialogFormVisible">
-        <el-form :model="teamListForm" ref="teamListForm" :label-position="leaderAssistantFormDialog_align">
+        <el-form :model="teamintroF" ref="teamintroF" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="姓名" porp="name" :label-width="formLabelWidth">
-                <el-input v-model="teamListForm.name" auto-complete="off"></el-input>
+                <el-input v-model="teamintroF.name" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="职位" porp="position" :label-width="formLabelWidth">
-                <el-input v-model="teamListForm.position" auto-complete="off"></el-input>
+                <el-input v-model="teamintroF.position" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="介绍" porp="introduction" :label-width="formLabelWidth">
-                <el-input v-model="teamListForm.introduction" auto-complete="off"></el-input>
+              <el-form-item label="介绍" porp="intro" :label-width="formLabelWidth">
+                <el-input v-model="teamintroF.intro" auto-complete="off"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -280,29 +298,26 @@
         </div>
       </el-dialog>
       <!-- 团队成员 Dialig Eng -->
+
       <el-table :data="leadTabData" border style="width: 100%">
-        <el-table-column :fixed="left" prop="name" label="项目名称" width="220" align="center">
+        <el-table-column :fixed="left" prop="name" label="项目名称" width="200" align="center">
         </el-table-column>
         <el-table-column prop="industryName" label="行业" width="200" align="center">
         </el-table-column>
-        <el-table-column prop="phase" label="轮次" width="200" align="center">
+        <el-table-column prop="phaseName" label="轮次" width="200" align="center">
         </el-table-column>
         <el-table-column prop="lastCast" label="上轮获投" width="200" align="center">
         </el-table-column>
         <el-table-column prop="cityStr" label="所在地" width="200" align="center">
         </el-table-column>
-        <el-table-column prop="startDate" label="成立时间" width="200" align="center">
+        <el-table-column prop="startDate" label="成立时间" width="250" align="center">
         </el-table-column>
-        <!-- <el-table-column prop="numberAdditions" label="加入次数" width="150" align="center">
-                  </el-table-column> -->
         <el-table-column prop="status" label="状态" width="200" align="center">
         </el-table-column>
-        <!-- <el-table-column prop="sharesNumber" label="分享次数" width="150" align="center">
-                  </el-table-column> -->
-        <el-table-column :fixed="right" label="操作" width="250" align="center">
+        <el-table-column :fixed="right" label="操作" width="200" align="center">
           <template scope="scope">
-            <el-button @click="hideRow(scope.$index,scope.row)" type="primary" size="small">隐 藏</el-button>
-            <el-button @click="showRow(scope.$index,scope.row)" type="primary" size="small">显 示</el-button>
+            <el-button :disabled="scope.row.status =='隐藏'" @click="hideRowBtn(scope.$index,scope.row)" type="primary" size="small">隐 藏</el-button>
+            <el-button :disabled="scope.row.status =='显示'" @click="showRowBtn(scope.$index,scope.row)" type="primary" size="small">显 示</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -311,6 +326,7 @@
 </template>
 
 <script>
+import { getDate } from 'common/js/config'
 export default {
   computed: {
     user() {
@@ -322,57 +338,60 @@ export default {
       }
     }
   },
-  created(){
-    this.selectCompany();
+  created() {
+    this.selectCompany('', '', '', '');
   },
   data() {
     return {
+      story: '', //团队优势
+      industry: [], //行业数据
+      city: [], //所在地数据
+      fileAddress: '',
+      file: '', //上传文件url
       leadTabData: [], //Tab
-      leadFormData: { //基本信息
-        projectName: '', //项目名称
+      company: { //基本信息
+        name: '', //项目名称
         industry: '', //行业
-        rounds: '', //轮次
+        phase: '', //轮次
         lastCast: '', //上轮获投
-        location: '', //所在地
-        established: '', //成立时间
-        numberAdditions: '', //加入次数
-        status: '显示', //状态
-        sharesNumber: '', //分享次数
-
+        city: '', //所在地
+        startdate: '', //成立时间
       },
-      projectIntroduction: { //项目介绍
-        oerview: "", //概述
-        detailedDescription: "", //详细介绍
-        productService: "", //产品服务
-        userMarket: "", //用户市场
+      productInfo: { //项目介绍
+        brief: "", //概述
+        intro: "", //详细介绍
+        productservice: "", //产品服务
+        usermarket: "", //用户市场
         businessModel: "", //商业模式
-        operationalData: "", //运营数据
-        businessProposal: "", //商业计划书
+        OperationData: "", //运营数据
+        businessPlan: "http://47.90.120.190:8086/group1/M00/00/02/rB9VtFnMxbyAK84jAAIwMA2mSNw677.png", //商业计划书url
       },
-      financingExperienceTab: [], //融资经历 Tab
-      financingExperienceForm: { //融资经历 Form
+      finance: [], //融资经历 Tab
+      financeF: { //融资经历 Form
         date: "", //时间
-        rounds: "", //轮次
-        AmountFinan: "", //融资金额
-        investor: "", //投资方
+        phase: "", //轮次
+        financeamount: "", //融资金额
+        investment: "", //投资方
+        financeamountunit: 'CNY' //金额类型
       },
-      teamListTab: [], //团队成员 Tab
-      teamListForm: { //团队成员 Form
+      teamintro: [], //团队成员 Tab
+      teamintroF: { //团队成员 Form
         name: "", //姓名
         position: "", //职位
-        introduction: "" //介绍
+        intro: "", //介绍
+        story: '' //团队优势
       },
-      businessInformationList: { //工商信息 Form
+      basicInfo: { //工商信息 Form
         name: "", //公司名称
-        type: "", //公司类型
-        startDate: "", //成立日期
-        registered: "", //注册资本
-        representative: "", //法人代表
-        operatingStart: "", //经营状态
-        registration: "", //登记机关
-        registraAddress: "", //注册地址
+        conpanyType: "", //公司类型
+        registcapi: "", //注册资本
+        startdate: "", //成立日期
+        opername: "", //法人代表
+        managementForms: "", //经营状态
+        registrationAuthority: "", //登记机关
+        registAddress: "", //注册地址
       },
-      leaderAssistantFormDialog: false, //添加人员 Dialog
+      leaderAssistantFormDialog: false, //添加项目 Dialog
       financingDialogFormVisible: false, //添加融资经历 Dialog
       AddTeamDialogFormVisible: false, //添加团队成员 Dialog
       leaderAssistantFormDialog_align: 'left',
@@ -380,58 +399,208 @@ export default {
     }
   },
   methods: {
-    addLeaderAssistantForm(n) { //添加
+    submitForm(event) { //提交上传文件到服务器
+      // alert(5656);
+      event.preventDefault();
+      let formData = new FormData();
+      // formData.append('file', this.file);
+      formData.append('files', this.$refs.avatarInput.files[0]);
+      let config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+      this.$http.post(this.api + '/files/upload', formData, config)
+        .then(function(res) {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              alert(2323);
+              console.log(res.data.message);
+              // let url = res.data.message;
+              this.fileAddress = res.data.message;
+              // this.address = url;
+              // console.log(url);
+              // console.log('///////////////////////////');
+              console.log(this.fileAddress);
+              this.$Message.success(res.data.message);
+            } else if (res.data.status == '403') {
+              this.$Message.error(res.data.message);
+            }
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        })
+    },
+    getFile(event) { //点击上传文件图像
+      this.$refs.avatarInput.click();
+    },
+    changeImage(e) { //上传文件input
+      this.file = event.target.files[0];
+      console.log('this file');
+      console.log(this.file);
+    },
+    getDate1(value) {
+      // console.log(value);
+      this.company.startdate = value;
+    },
+    getDate2(value) {
+      console.log(value);
+      this.basicInfo.startdate = value;
+    },
+    getDate3(value) {
+      console.log(value);
+      this.financeF.date = value;
+    },
+    addLeaderAssistantForm(n) { //添加平台云项目btn
       // alert(n);
       if (n == 1) {
+        this.select2Menu();
         // alert(1);
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
       } else if (n == 2) {
         // alert(2);
-        let new_financingExperienceForm = {
+        let new_financeF = {
           date: "", //时间
-          rounds: "", //轮次
-          AmountFinan: "", //融资金额
-          investor: "", //投资方
+          phase: "", //轮次
+          financeamount: "", //融资金额
+          investment: "", //投资方
+          financeamountunit: 'CNY' //金额类型
         };
-        this.financingExperienceForm = new_financingExperienceForm;
+        this.financeF = new_financeF;
         this.financingDialogFormVisible = !this.financingDialogFormVisible;
       } else if (n == 3) {
         // alert(n);
-        let new_teamListForm = {
+        let new_teamintroF = {
           name: "", //姓名
           position: "", //职位
-          introduction: "" //介绍
+          intro: "", //介绍
+          story: '' //团队优势
         };
-        this.teamListForm = new_teamListForm;
+        this.teamintroF = new_teamintroF;
         this.AddTeamDialogFormVisible = !this.AddTeamDialogFormVisible;
       }
     },
     leaderAssistantFormSaveBtn(n) { //确定
       if (n == 1) {
         // alert(1);
-        this.leadTabData.push(this.leadFormData);
+        console.log('添加团队成员信息');
+        console.log(this.company);
+        console.log(this.productInfo);
+        console.log(this.finance);
+        console.log(this.teamintro);
+        console.log(this.basicInfo);
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
-        this.leadFormData = {};
+        this.company = {};
+        this.productInfo = {};
+        this.finance = [];
+        this.teamintro = [];
+        this.basicInfo = {};
       } else if (n == 2) {
         // alert(2);
-        this.financingExperienceTab.push(this.financingExperienceForm);
+        this.finance.push(this.financeF);
         this.financingDialogFormVisible = !this.financingDialogFormVisible;
-        this.financingExperienceForm = {};
+        this.financeF = {};
       } else if (n == 3) {
-        // alert(n);
-        this.teamListTab.push(this.teamListForm);
+        // alert(3);
+        this.teamintroF.story = this.story;
+        this.teamintro.push(this.teamintroF);
         this.AddTeamDialogFormVisible = !this.AddTeamDialogFormVisible;
-        this.teamListForm = {};
+        this.teamintroF = {};
       }
     },
-    hideRow(index, row) {
-      row.status = '隐藏';
+    storyBlur() { //获取团队优势数据
+      // alert(666);
+      this.teamintroF.story = this.story;
+      console.log(this.teamintroF.story);
     },
-    showRow(index, row) {
-      row.status = '显示';
+    hideRowBtn(index, row) { //隐藏按钮
+      this.concealCompany(row.id);
     },
-    removeRow(index, rows) {
-      rows.splice(index, 1);
+    showRowBtn(index, row) { //显示按钮
+      this.showCompany(row.id);
+    },
+    removeRow(index, rows) { //没有
+      // rows.splice(index, 1);
+    },
+    searchHandling() { //搜索
+      let searchValue = this.input2;
+      console.log(this.input2);
+      this.selectCompany(searchValue, searchValue, searchValue, searchValue);
+    },
+    select2Menu() { //查询行业and所在地数据
+      this.$http.post(this.api + '/dictionaryController/select2Menu', { //数据字典=>行业
+        "dicParent": '1'
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data);
+            this.industry = res.data.result;
+            this.$Message.success(res.data.message);
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        });
+      this.$http.post(this.api + '/dictionaryController/select2Menu', { //数据字典=>行业
+        "dicParent": 501
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data.result);
+              this.$Message.success(res.data.message);
+              this.city = res.data.result;
+            }
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        });
+    },
+    showCompany(id) { //显示云项目列表数据
+      this.$http.post(this.api + '/CompanyClieController/showCompany', {
+        id: id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.selectCompany();
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    },
+    concealCompany(id) { //隐藏云项目列表数据
+      this.$http.post(this.api + '/CompanyClieController/concealCompany', {
+        id: id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.selectCompany();
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
     },
     selectCompany(name, industry, phase, citystr) { //查询平台云项目列表数据
       this.$http.post(this.api + '/CompanyClieController/selectCompany', {
@@ -444,19 +613,45 @@ export default {
           if (res.status == '200') {
             if (res.data.status == '200') {
               console.log(res.data);
-              res.data.result.list.forEach( item => {
-                if(item.status == '0'){
-                  item.status = '';
-                } else if(item.status == '1'){
-                  item.status = '';
-                }
-              },this);
+              res.data.result.list.forEach(item => {
+                if (item.status == '2') {
+                  item.status = '隐藏';
+                } else if (item.status == '1') {
+                  item.status = '显示';
+                };
+                item.startDate = getDate(item.startDate);
+              }, this);
               this.leadTabData = res.data.result.list;
               this.$Message.success(res.data.message);
+            } else if (res.data.status == '403') {
+              this.$Message.error(res.data.message);
             }
-
-          } else if (res.data.status == '403') {
-            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    },
+    insertMessage() { //新增平台云项目项目
+      this.$http.post(this.api + '/productClieController/insertMessage', {
+        company: this.company,
+        productInfo: this.productInfo,
+        productservice: this.productservice,
+        basicInfo: this.basicInfo,
+        finance: this.finance,
+        teamintro: this.teamintro,
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res);
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.selectCompany('', '', '', '');
+              this.$Message.success(res.data.message);
+            } else if (res.data.status == '403') {
+              this.$Message.error(res.data.message);
+            }
           }
         })
         .catch(error => {

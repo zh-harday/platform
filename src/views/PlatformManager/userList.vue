@@ -286,7 +286,7 @@ export default {
         roleName: '' //角色名称
       };
       this.userListFormData = new_userListFormData;
-      this.queryUserListByUM(); //查询企业角色列表
+      this.queryUserListByUM(1); //查询企业角色列表
       this.userListDialogFormVisible = true;
     },
     editSaveUserListBtn() { //确定
@@ -321,16 +321,14 @@ export default {
       console.log(row);
       this.add = false;
       this.userListDialogFormVisible = true;
-      this.queryUser(row.id); //用户详情
-      this.queryUserListByUM(row.umId); //查询企业角色列表
-      // this.queryUserRoleList(row.umId); //查询用户拥有角色列表
+      this.queryUser(row.userId); //用户详情
+      this.queryUserListByUM(row.userId,row.umId); //查询企业角色列表
 
     },
     // saveUserListTabData(index, row) { //保存
     //   row.editFlag = false;
     // },
     checkLocking(index, row) { //锁定
-      // row.locked = !row.locked;
       this.locked = !this.locked;
       console.log(this.locked);
       if (this.locked) { //锁定
@@ -341,7 +339,7 @@ export default {
     },
     lockUnlock(num) { //启用/锁定用户
       this.$http.post(this.api + '/user/lockUnlock', {
-        "umid": this.userId[0].um_id,
+        "umid": this.userId.merchants[0].um_id,
         "lockValue": num
       })
         .then(res => {
@@ -361,38 +359,25 @@ export default {
           // console.log('请求超时');
         })
     },
-    queryUserListByUM(umid) { //查询企业角色列表 api
+    queryUserListByUM(id,umid) { //查询企业角色列表 api
+    if(id == '1'){
+      id = this.userId.merchants[0].id;
+    };
       this.$http.post(this.api + '/role/queryRoleList', {
-        merchantId: this.userId[0].id,
+        merchantId: id
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
+              if(umid){
+                alert('umid');
+                this.queryUserRoleList(umid); //查询用户拥有角色列表
+              };
               console.log('企业角色列表');
-              console.log(res.data.result);
+              console.log(res.data);
               this.roleList = res.data.result;
-              this.queryUserRoleList(umid); //查询用户拥有角色列表
               this.$Message.success(res.data.message);
             }
-          } else if (res.status == '403') {
-            this.$Message.error(res.data.message);
-          }
-        })
-        .catch(error => {
-          this.$Message.error('请求超时');
-        })
-    },
-    queryRoleListByUM(num) { //查询平台所有用户列表 api
-      this.$http.post(this.api + '/user/queryUserByMid', {
-        "merchantId": this.userId.merchants[0].id,
-        "userName": this.userId.userInfor.name,
-        "lockValue": num,
-      })
-        .then(res => {
-          if (res.status == '200') {
-            console.log(res.data);
-            this.userListTabData = res.data.result;
-            this.$Message.success(res.data.message);
           } else if (res.data.status == '403') {
             this.$Message.error(res.data.message);
           }
@@ -415,7 +400,6 @@ export default {
             };
             console.log('合并后数组');
             console.log(this.roleList);
-            this.userListTabData = res.data.result.list;
             this.$Message.success(res.data.message);
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
@@ -426,8 +410,66 @@ export default {
         })
     },
     queryUser(id) { //查询用户详情列表数据 api
-      // this.$http.post(this.api + '/user/queryUser', {
-      this.$http.post(this.api + '/user/queryUserInfo', {
+      this.$http.post(this.api + '/user/queryUser', {
+      // this.$http.post(this.api + '/user/queryUserInfo', {
+        "userId": id
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log('用户详情');
+              console.log(res.data);
+              for (let item in res.data.result) {
+                if (res.data.result.six == '0') {
+                  res.data.result.six = '女';
+                } else {
+                  res.data.result.six = '男';
+                }
+                // this.userListFormData.pass = this.md5(res.data.result.pass, 32);
+              };
+              this.userListFormData.id = res.data.result.id;
+              this.userListFormData.umId = res.data.result.umId;
+              this.userListFormData.name = res.data.result.name;
+              this.userListFormData.number = res.data.result.number;
+              this.userListFormData.pass = res.data.result.pass;
+              this.userListFormData.birthday = res.data.result.birthday;
+              this.userListFormData.six = res.data.result.six;
+              this.userListFormData.phone = res.data.result.phone;
+              this.userListFormData.emil = res.data.result.emil;
+              this.$Message.success(res.data.message);
+            }
+
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    },
+    queryRoleListByUM(num) { //查询平台所有用户列表 api
+      this.$http.post(this.api + '/user/queryUserByMid', {
+        "merchantId": this.userId.merchants[0].id,
+        "userName": this.userId.userInfor.name,
+        "lockValue": num,
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res.data);
+            this.userListTabData = res.data.result;
+            this.$Message.success(res.data.message);
+          } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error('请求超时');
+        })
+    },
+    queryUser(id) { //查询用户详情列表数据 api
+      this.$http.post(this.api + '/user/queryUser', {
+      // this.$http.post(this.api + '/user/queryUserInfo', {
         "userId": id
       })
         .then(res => {
@@ -495,7 +537,7 @@ export default {
     },
     saveUser() { //保存新增用户信息
       this.$http.post(this.api + '/user/saveUser', {
-        "mId": this.userId[0].id,
+        "mId": this.userId.merchants[0].id,
         "name": this.userListFormData.name,
         "number": this.userListFormData.number,
         "pass": "123456",

@@ -29,12 +29,11 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                // target:'http://192.168.0.191:9092',//平台
-                // target:'http://192.168.0.198:9092',//平台
+                target:'http://192.168.0.198:9092',//系统
+                // target:'http://192.168.0.188:9092',//系统
+                // target:'http://192.168.0.131:9092',//文军凡IP
                 // target: 'http://18f46963j4.iok.la',
-                // target:'http://192.168.0.131:9092',// 文军凡IP
-                target:'http://192.168.0.133:9092',// 蔡永亮 IP
-                // target:'http://100.64.33.181:9091',
+                // target:'http://100.64.33.131:9092',
                 // target:'http://zhqwjmw.eicp.net',
                 changeOrigin:true,
                 secure: false,

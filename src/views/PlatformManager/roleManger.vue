@@ -49,6 +49,7 @@
             </el-table>
           </div>
         </el-col>
+        
         <el-col :span="16">
           <div class="grid-content bg-purple">
             <el-row :gutter="0" class="roleName">
@@ -64,7 +65,6 @@
               </el-col>
             </el-row>
             <!-- 权限列表 Start -->
-
             <!-- 权限列表 End -->
             <!-- sys menu -->
             <el-row>

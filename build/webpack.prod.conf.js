@@ -19,7 +19,12 @@ var webpackConfig = merge(baseWebpackConfig, {
     output: {
         path: config.build.assetsRoot,
         filename: utils.assetsPath('js/[name].[chunkhash].js'),
-        chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+        chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
+        publicPath:'/'
+        // path:'/dist',
+        // filename: '[name].js',
+        // chunkFilename:'js/[id].[chunkhash].js',
+        // publicPath: '/',
     },
     plugins: [
         // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -29,12 +34,13 @@ var webpackConfig = merge(baseWebpackConfig, {
             //     NODE_ENV: '"development"'
             // }
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            sourceMap: true
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     },
+        //     // sourceMap: true
+        //     sourceMap: false
+        // }),
         // extract css into its own file
         new ExtractTextPlugin({
             filename: utils.assetsPath('css/[name].[contenthash].css')
