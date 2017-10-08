@@ -10,7 +10,9 @@
         </el-col>
         <el-col :span="16">
           <div class="grid-content bg-purple-dark saveRoleManger">
-            <div>角色权限<span v-show="rowName != ''">({{ rowName }})</span></div>
+            <div>角色权限
+              <span v-show="rowName != ''">({{ rowName }})</span>
+            </div>
             <el-button type="primary" class="addBtn" @click="authorizationBtn">新增权限</el-button>
           </div>
         </el-col>
@@ -39,7 +41,6 @@
               <el-table-column label="操作" width="" align="center" min-width="100px">
                 <template scope="scope">
                   <el-button v-if="!scope.row.isAdmin" @click="editSelecttionTab(scope.$index,scope.row)" type="primary" size="small">编辑</el-button>
-                  <!-- <el-button v-if="!scope.row.isAdmin" @click="saveSelecttionTab(scope.$index,scope.row)" type="primary" size="small">保存</el-button> -->
                   <el-button v-if="!scope.row.isAdmin" @click="remove(scope.index,scope.row,rolTabData_L)" type="primary" size="small">删除</el-button>
                 </template>
               </el-table-column>
@@ -76,7 +77,6 @@
                     </div>
                   </el-col>
                 </el-row>
-
                 <el-row class="common sys_menu_head_2" v-for="list in item.children" :key="list.id">
                   <el-col :span="15">
                     <div class="menuName">{{list.menuName}}</div>
@@ -125,13 +125,11 @@ export default {
     this.rolTabData_R.forEach(row => {
       // this.$refs.multipleTable.toggleRowSelection(row);
     });
-    // console.log(this.userInfor);
-    // console.log(this.merchants[0].um_id);
   },
   data() {
     return {
       menuIds: '', //保存角色权限
-      rowName: "",
+      rowName: "请选择角色进行操作",
       ResourceArr: [], //保存角色权限的数组
       checked: 0,
       menusName: [],
@@ -151,6 +149,7 @@ export default {
         { roleName: "客户权限", check: false },
         { roleName: "账号管理", check: false },
       ],
+      editRole: false,
       multipleSelection: [],
 
     }
@@ -186,6 +185,7 @@ export default {
       })
         .then(res => {
           if (res.status == '200') {
+            console.log(res.data.result);
             this.rolTabData_L = res.data.result;
             this.$Message.success(res.data.message);
             // this.findResourceByMid(); //查询企业权限列表
@@ -258,9 +258,10 @@ export default {
           console.log('请求超时');
         })
     },
-    updateRole(roleName) { //编辑保存角色
+    updateRole() { //编辑保存角色
       this.$http.post(this.api + '/role/updateRole', {
-        "roleName": roleName,
+        id: this.roleId,
+        "roleName": this.rolFormData_L.roleName,
         "merchantId": this.merchants[0].id
       })
         .then(res => {
@@ -276,29 +277,20 @@ export default {
           }
         })
         .catch(error => {
-          alert(888);
-          // this.$Message.error('请求超时');
-          console.log('请求超时');
+          this.$Message.error('请求超时');
         })
     },
     settingQx(arr) {
-
       var arrs = [];
-
       for (let i = 0; i < this.menus.length; i++) {
-
         this.menus[i].selected = false;
         for (let j = 0; j < arr.length; j++) {
           if (this.menus[i].id === arr[j].id) {
             this.menus[i].selected = true;
           }
-
         }
         arrs[i] = this.menus[i];
       }
-
-
-
       this.menus.map((item) => {
 
         if (item.children) {
@@ -311,10 +303,7 @@ export default {
           })
         }
       })
-
       this.menus = arrs;
-
-
     },
     findResourceByRid(id) { //查询角色对应权限
       this.$http.post(this.api + '/role/findResourceByRid', {
@@ -336,11 +325,14 @@ export default {
           }
         })
         .catch(error => {
-          // this.$Message.error('请求超时');
-          console.log(error);
+          this.$Message.error('请求超时');
         })
     },
     findByRid(row) { //查询角色
+    if(row.isAdmin){
+      this.$Message.warning('超级管理员不能进行操作');
+      return;
+    };
       this.rowName = row.roleName;
       this.roleId = row.id; //保存角色id
       this.findResourceByRid(this.roleId);
@@ -386,7 +378,12 @@ export default {
         })
     },
     pushRolTabData_L() { //确定
-      this.rolTabData_L.push(this.rolFormData_L);
+      if(this.editRole){
+        this.updateRole();
+        this.rolFormDialog = false;
+        return;
+      };
+      this.saveRole();
       this.rolFormData_L = {};
       this.rolFormDialog = false;
     },
@@ -401,12 +398,12 @@ export default {
       data.splice(index, 1);
       this.deleteRole(row.id);
     },
-    saveSelecttionTab(index, row) { //编辑保存角色
-      this.updateRole(row.roleName);
-    },
     editSelecttionTab(index, row) { //编辑
       // alert(1002);
-
+      this.editRole =true;
+      this.rolFormDialog = true;
+      this.rolFormData_L.roleName = row.roleName;
+      this.roleId = row.id;
       // row.isAdmin = !row.isAdmin;
     },
     handleSelectionChange(val) { //选中的数据
@@ -445,11 +442,12 @@ section {
     }
     .sys_menu_head_2 {
       width: 100%;
-      height: 40px;
+      height: 41px;
       overflow: hidden;
-      line-height: 40px;
+      line-height: 41px;
       box-sizing: border-box;
-      div {
+      border-bottom: 1px solid #dfe6ec;
+      >div {
         text-align: center;
         box-sizing: border-box;
         border-left: 1px solid #dfe6ec;

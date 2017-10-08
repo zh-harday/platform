@@ -146,7 +146,7 @@ export default {
       checkList: [],
       selected: 0,
       menus: [], //菜单列表数据
-      rowName: '',
+      rowName: '请选择客户类型进行操作',
       roleId: '',
       customerTabData_L: [], //客户类型列表数据
       customerFormData_L: { //添加客户类型表单
@@ -464,11 +464,13 @@ section {
     }
     .sys_menu_head_2 {
       width: 100%;
-      height: 40px;
+      height: 41px;
       overflow: hidden;
-      line-height: 40px;
+      line-height: 41px;
       box-sizing: border-box;
-      div {
+      border-bottom: 1px solid #dfe6ec;
+      // background: #dfe6ec;
+      >div {
         text-align: center;
         box-sizing: border-box;
         border-left: 1px solid #dfe6ec;
