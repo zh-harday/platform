@@ -2,18 +2,17 @@
   <section>
     <!-- 这是客户权限页面 -->
     <div>
-      <el-row class="customerMang">
-        <el-col :span="6" class="searchIpt_left">
+      <el-row class="customerMang" :gutter="20">
+        <el-col :span="8" class="searchIpt_left">
           <div class="grid-content bg-purple-dark">
             <el-button @click="addCustomer" class="searchIpt_left" type="primary">添加</el-button>
           </div>
         </el-col>
-        <el-col :span="10">
-          <div class="grid-content bg-purple-dark"></div>
-        </el-col>
-        <el-col :span="8" class="searchIpt">
-          <div class="grid-content bg-purple-dark">
-            <el-button class="searchIpt" type="primary">保存</el-button>
+      
+        <el-col :span="16">
+          <div class="grid-content bg-purple-dark saveRoleManger">
+            <div>客户权限<span v-show="rowName != ''">({{ rowName }})</span></div>
+            <el-button class="searchIpt" type="primary" @click="svaeQuanxian">保存</el-button>
           </div>
         </el-col>
       </el-row>
@@ -50,12 +49,12 @@
       </el-dialog>
       <!-- 新增客户 Dialog End -->
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="grid-content bg-purple">
             <el-table :data="customerTabData_L" border style="width: 100%" align="center">
               <el-table-column prop="typeName" label="客户类型" width="" align="center">
                 <template scope="scope">
-                  <span class="cursor" @click="queryObjectBtn(scope.$index,scope.row)" v-if="!scope.row.editFlag">{{ scope.row.typeName }}</span>
+                  <span class="cursor" @click="queryMenuByType(scope.row)" v-if="!scope.row.editFlag">{{ scope.row.typeName }}</span>
                   <span v-if="scope.row.editFlag" class="cell-edit-input">
                     <el-input v-model="scope.row.typeName" placeholder=""></el-input>
                   </span>
@@ -69,7 +68,6 @@
             </el-table>
           </div>
         </el-col>
-
         <el-col :span="16">
           <div class="grid-content bg-purple">
             <el-row :gutter="0" class="roleName">
@@ -95,25 +93,27 @@
                   </el-col>
                   <el-col :span='9'>
                     <div class="checkbox">
-                      <el-checkbox-group @change="handleSelectionChange1($event,item)" v-model="checkList">
-                        <el-checkbox label="a"></el-checkbox>
-                      </el-checkbox-group>
+                      <el-checkbox @change="handleSelectionChange1()" v-model="item.selected"></el-checkbox>
                     </div>
                   </el-col>
                 </el-row>
-                <el-table @selection-change="handleSelectionChange2(selection)" stripe :show-header="false" :data="item.children" border style="width: 100%">
-                  <el-table-column prop="menuName" label="" align="center" width="">
-                  </el-table-column>
-                  <el-table-column width="398px" align="center">
-                    <template scope="scope">
-                      <el-checkbox @change="handleSelectionChange2($event,scope.row)" v-model="item.selected"></el-checkbox>
-                    </template>
-                  </el-table-column>
-                </el-table>
+
+                <el-row class="common sys_menu_head_2" v-for="list in item.children" :key="list.id">
+                  <el-col :span="15">
+                    <div class="menuName">{{list.menuName}}</div>
+                  </el-col>
+                  <el-col :span='9'>
+                    <div class="checkbox">
+                      <el-checkbox @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-col>
             </el-row>
+            <!-- sys menu end -->
           </div>
         </el-col>
+
         <!-- sys menu end -->
       </el-row>
     </div>
@@ -146,6 +146,8 @@ export default {
       checkList: [],
       selected: 0,
       menus: [], //菜单列表数据
+      rowName: '',
+      roleId: '',
       customerTabData_L: [], //客户类型列表数据
       customerFormData_L: { //添加客户类型表单
         typeName: "", //类型名称
@@ -185,6 +187,60 @@ export default {
     }
   },
   methods: {
+    svaeQuanxian() {
+      if (this.roleId == '' || this.menus == '') {
+        this.$Message.warning('请先选择一个客户并分配权限后再试');
+        return;
+      };
+      this.authorization();
+    },
+    authorization() { //角色授权 api
+      var arr = [];
+      this.menus.map(item => {
+        if (item.selected) {
+          arr.push(item.id)
+        }
+        if (item.children) {
+          item.children.map(list => {
+            if (list.selected) {
+              arr.push(list.id)
+            }
+          })
+        }
+      })
+      var menuIds = arr.join(",")
+
+      this.$http.post(this.api + '/merchantType/typeBindMenu', {
+        mtid: this.roleId,
+        menuIds: menuIds
+      })
+        .then(res => {
+          if (res.status == '200') {
+            this.$Message.success(res.data.message);
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          // this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    },
+    handleSelectionChange1() {
+      var arr = [];
+      this.menus.map((item, index) => {
+        arr[index] = item;
+      })
+      this.menus = arr;
+    },
+    handleSelectionChange2() {
+      var arr = [];
+      this.menus.map((item, index) => {
+        arr[index] = item;
+      })
+      this.menus = arr;
+
+    },
     addCustomer() { //新增客户类型
       let new_customerFormData_L = {
         typeName: "", //类型名称
@@ -288,25 +344,15 @@ export default {
         .then(res => {
           if (res.status == '200') {
             this.menus = getNodes(res.data.result);
-            console.log('客户总权限列表数据');
-            // console.log(this.menus);
+
             this.menus.forEach(function(ele, index) {
-              // alert(111);
               ele.selected = false;
-              // this.menusName.push(obj1);
               if (ele.children) {
                 ele.children.forEach(function(item, index) {
-                  alert(222);
                   item.selected = false;
-                  // this.menusName.children.push(obj2);
-                }, this);
+                });
               }
-            }, this);
-            console.log(this.menus);
-            console.log('/****menusName*****/');
-            console.log(this.menusName);
-            console.log('/****menus*********/');
-            console.log(this.menus);
+            });
             this.$Message.success(res.data.message);
           }
         })
@@ -314,69 +360,64 @@ export default {
           this.$Message.error('请求超时');
         })
     },
-    queryObjectBtn(index, row) {
-      console.log(row);
-      this.queryObject(row.id);
-    },
-    queryObject(id) { //查询平台客户类型详情
-      this.$http.post(this.api + '/merchantType/queryObject', {
-        merchantTypeId: id
-      })
-        .then(res => {
-          if (res.status == '200') {
-            // console.log(res);
-            if (res.data.status == '200') {
-              console.log(res.data);
-              let id = res.data.result.id;
-              this.queryMenuByType(id);
-              this.$Message.success(res.data.message);
-            } else if (res.data.status == '403') {
-              this.$Message.error(res.data.message);
-            }
+
+    settingQx(arr) {
+
+      var arrs = [];
+
+      for (let i = 0; i < this.menus.length; i++) {
+
+        this.menus[i].selected = false;
+        for (let j = 0; j < arr.length; j++) {
+          if (this.menus[i].id === arr[j]) {
+            this.menus[i].selected = true;
           }
-        })
-        .catch(error => {
-          this.$Message.error("请求超时");
-        })
+
+        }
+        arrs[i] = this.menus[i];
+      }
+
+
+
+      this.menus.map((item) => {
+
+        if (item.children) {
+          item.children.map((list) => {
+            arr.map((ele) => {
+              if (list.id == ele) {
+                list.selected = true;
+              }
+            })
+          })
+        }
+      })
+
+      this.menus = arrs;
+
+
     },
-    queryMenuByType(id) { //客户类型对应菜单
+    queryMenuByType(row) { //客户类型对应菜单
+      this.rowName = row.typeName;
+      this.roleId = row.id;
       this.$http.post(this.api + '/merchantType/queryMenuByType', {
-        mtid: id
+        mtid: row.id
       })
         .then(res => {
           if (res.status == '200') {
-            if (res.data.status == '200') {
-              console.log(res.data.result);
-              this.menus.forEach(function(item, index) {
-                res.data.result.forEach(function(ele, index) {
-                  console.log(this.menus);
-                  // console.log('****************************')
-                  // console.log(ele);
-                  // console.log('////////////////////////////////');
-                  // console.log(item.id);
-                  if (item.id === ele) {
-                    alert(555);
-                    // item.selected = true;
-                  }
-                }, this);
-              }, this);
-              this.$Message.success(res.data.message);
-            } else if (res.data.status == '403') {
-              this.$Message.error(res.data.message);
-            }
+            this.menus.forEach(function(ele, index) {
+              ele.selected = false;
+              if (ele.children) {
+                ele.children.forEach(function(item, index) {
+                  item.selected = false;
+                });
+              }
+            });
+            this.settingQx(res.data.result)
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
         })
-    },
-    handleSelectionChange1(e, item) {
-      console.log(e);
-      // console.log(item);
-      item.selected = !item.selected;
-    },
-    handleSelectionChange2(e, item) {
-      console.log(item);
     }
   }
 }
@@ -396,7 +437,6 @@ section {
     }
     .searchIpt {
       float: right;
-      margin-right: 10%;
     }
     .roleName {
       height: 40px;

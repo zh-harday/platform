@@ -10,7 +10,7 @@
         </el-col>
         <el-col :span="16">
           <div class="grid-content bg-purple-dark saveRoleManger">
-            <div>角色权限</div>
+            <div>角色权限<span v-show="rowName != ''">({{ rowName }})</span></div>
             <el-button type="primary" class="addBtn" @click="authorizationBtn">新增权限</el-button>
           </div>
         </el-col>
@@ -33,23 +33,20 @@
             <el-table :data="rolTabData_L" border style="width: 100%" align="center">
               <el-table-column prop="roleName" label="角色名称" width="" align="center">
                 <template scope="scope">
-                  <span class="cursor" @click="findByRid(scope.$index,scope.row)" v-if="!scope.row.isAdmin">{{ scope.row.roleName }}</span>
-                  <span v-if="scope.row.isAdmin" class="cell-edit-input">
-                    <el-input v-model="scope.row.roleName" placeholder=""></el-input>
-                  </span>
+                  <span class="cursor" @click="findByRid(scope.row)">{{ scope.row.roleName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="" align="center">
+              <el-table-column label="操作" width="" align="center" min-width="100px">
                 <template scope="scope">
                   <el-button v-if="!scope.row.isAdmin" @click="editSelecttionTab(scope.$index,scope.row)" type="primary" size="small">编辑</el-button>
-                  <el-button v-if="scope.row.isAdmin" @click="saveSelecttionTab(scope.$index,scope.row)" type="primary" size="small">保存</el-button>
+                  <!-- <el-button v-if="!scope.row.isAdmin" @click="saveSelecttionTab(scope.$index,scope.row)" type="primary" size="small">保存</el-button> -->
                   <el-button v-if="!scope.row.isAdmin" @click="remove(scope.index,scope.row,rolTabData_L)" type="primary" size="small">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
         </el-col>
-        
+
         <el-col :span="16">
           <div class="grid-content bg-purple">
             <el-row :gutter="0" class="roleName">
@@ -75,19 +72,21 @@
                   </el-col>
                   <el-col :span='9'>
                     <div class="checkbox">
-                      <el-checkbox @change="handleSelectionChange1($event,item)" :v-model="item.selected"></el-checkbox>
+                      <el-checkbox @change="handleSelectionChange1()" v-model="item.selected"></el-checkbox>
                     </div>
                   </el-col>
                 </el-row>
-                <el-table @selection-change="handleSelectionChange2(selection)" stripe :show-header="false" :data="item.children" border style="width: 100%">
-                  <el-table-column prop="menuName" label="" align="center" width="">
-                  </el-table-column>
-                  <el-table-column width="398px" align="center">
-                    <template scope="scope">
-                      <el-checkbox @change="handleSelectionChange2($event,scope.row)" v-model="item.selected"></el-checkbox>
-                    </template>
-                  </el-table-column>
-                </el-table>
+
+                <el-row class="common sys_menu_head_2" v-for="list in item.children" :key="list.id">
+                  <el-col :span="15">
+                    <div class="menuName">{{list.menuName}}</div>
+                  </el-col>
+                  <el-col :span='9'>
+                    <div class="checkbox">
+                      <el-checkbox @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-col>
             </el-row>
             <!-- sys menu end -->
@@ -132,10 +131,11 @@ export default {
   data() {
     return {
       menuIds: '', //保存角色权限
+      rowName: "",
       ResourceArr: [], //保存角色权限的数组
       checked: 0,
       menusName: [],
-      menus: [],
+      menus: [],//所有权限
       merchants: [], //企业信息
       userInfor: {}, //用户信息
       merchantId: '', //企业id
@@ -152,6 +152,7 @@ export default {
         { roleName: "账号管理", check: false },
       ],
       multipleSelection: [],
+
     }
   },
   methods: {
@@ -162,44 +163,29 @@ export default {
         }
       }
     },
-    handleSelectionChange1(event, item) {
-      //alert(111);
-      this.multipleSelection = item;
-      console.log(event.target.checked);
-      console.log(this.multipleSelection);
-      if (event.target.checked) {
-        this.ResourceArr.push(item.id);
-      } else {
-        let index = this.forEachArr(item.id);
-        this.ResourceArr.splice(index, 1);
-        console.log(this.ResourceArr)
-      }
-      console.log('111111111111111111111111');
-      console.log(this.ResourceArr);
+    handleSelectionChange1(id) {
+      var arr = [];
+      this.menus.map((item, index) => {
+        arr[index] = item;
+      })
+      this.menus = arr;
     },
-    handleSelectionChange2(event, row) {
-      //alert(222);
-      this.multipleSelection = row;
-      console.log(event.target.checked);
-      console.log(this.multipleSelection);
-      if (event.target.checked) {
-        this.ResourceArr.push(row.id);
-      } else {
-        let index = this.forEachArr(row.id)
-        this.ResourceArr.splice(index, 1);
-      };
-      console.log('22222222222222222222222222222');
-      console.log(this.ResourceArr);
+    handleSelectionChange2(id) {
+      var arr = [];
+      this.menus.map((item, index) => {
+        arr[index] = item;
+      })
+      this.menus = arr;
+
     },
     queryRoleListByUM() { //查询用户角色列表
       // this.$http.post(this.api+'/role/queryRoleListByUM', {
-      this.$http.post(this.api+'/role/queryRoleList', {
+      this.$http.post(this.api + '/role/queryRoleList', {
         // umid: this.merchants[0].um_id
         merchantId: this.merchants[0].id
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data.result);
             this.rolTabData_L = res.data.result;
             this.$Message.success(res.data.message);
             // this.findResourceByMid(); //查询企业权限列表
@@ -213,46 +199,30 @@ export default {
         })
     },
     findResourceByMid() { //查询企业权限列表
-      this.$http.post(this.api+'/user/findResourceByMid', {
+      this.$http.post(this.api + '/user/findResourceByMid', {
         merchantId: this.merchants[0].id
       })
         .then(res => {
           if (res.status == '200') {
             this.queryRoleListByUM()
-            console.log(res.data.result);
             this.menus = getNodes(res.data.result);
-            console.log('***********************');
-            console.log(this.menus);
-            // this.menus.forEach(function(ele, index) {
-            //   // alert(111);
-            //   let obj1 = {};
-            //   obj1.menuName = ele.menuName;
-            //   obj1.selected = false;
-            //   this.menusName.push(obj1);
-            //   if (item.children) {
-            //     ele.children.forEach(function(item, index) {
-            //       alert(222);
-            //       let obj2 = {};
-            //       obj2.menuName = item.menuName;
-            //       obj2.selected = false;
-            //       this.menusName.children.push(obj2);
-            //     }, this);
-            //   }
-            // }, this);
-            console.log('/****menusName*****/');
-            console.log(this.menusName);
-            console.log('/****menus*********/');
-            console.log(this.menus);
-            this.$Message.success(res.data.message);
+            this.menus.forEach(function(ele, index) {
+              ele.selected = false;
+              if (ele.children) {
+                ele.children.forEach(function(item, index) {
+                  item.selected = false;
+                });
+              }
+            });
+
           }
         })
         .catch(error => {
-          // this.$Message.error('请求超时');
-          console.log('请求超时');
+          this.$Message.error('请求超时');
         })
     },
     saveRole() { //新增角色
-      this.$http.post(this.api+'/role/saveRole', {
+      this.$http.post(this.api + '/role/saveRole', {
         "merchantId": this.merchants[0].id,
         "roleName": this.rolFormData_L.roleName,
       })
@@ -271,7 +241,7 @@ export default {
         })
     },
     deleteRole(id) { //删除角色
-      this.$http.post(this.api+'/role/deleteRole', {
+      this.$http.post(this.api + '/role/deleteRole', {
         "roleId": id,
       })
         .then(res => {
@@ -289,7 +259,7 @@ export default {
         })
     },
     updateRole(roleName) { //编辑保存角色
-      this.$http.post(this.api+'/role/updateRole', {
+      this.$http.post(this.api + '/role/updateRole', {
         "roleName": roleName,
         "merchantId": this.merchants[0].id
       })
@@ -311,74 +281,100 @@ export default {
           console.log('请求超时');
         })
     },
+    settingQx(arr) {
+
+      var arrs = [];
+
+      for (let i = 0; i < this.menus.length; i++) {
+
+        this.menus[i].selected = false;
+        for (let j = 0; j < arr.length; j++) {
+          if (this.menus[i].id === arr[j].id) {
+            this.menus[i].selected = true;
+          }
+
+        }
+        arrs[i] = this.menus[i];
+      }
+
+
+
+      this.menus.map((item) => {
+
+        if (item.children) {
+          item.children.map((list) => {
+            arr.map((ele) => {
+              if (list.id == ele.id) {
+                list.selected = true;
+              }
+            })
+          })
+        }
+      })
+
+      this.menus = arrs;
+
+
+    },
     findResourceByRid(id) { //查询角色对应权限
-      this.$http.post(this.api+'/role/findResourceByRid', {
+      this.$http.post(this.api + '/role/findResourceByRid', {
         "r_id": id
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data.result);
-            // this.queryRoleListByUM();
-            alert(555);
-            for (let m = 0; m < this.menusName.length; m++) {
-              this.menusName[m].selected = 0;
-              if (this.menusName.children != '') {
-                for (let n = 0; n < this.menusName.children.length; n++) {
-                  alert(1);
-                  this.menusName.children[n].selected = 0;
-                };
-              };
-            };
-            for (let i = 0; i < res.data.result.length; i++) {
-              for (let k = 0; k < this.menusName.length; k++) {
-                if (res.data.result[i].menuName == this.menusName[k].menuName) {
-                  this.menusName[k].selected = 1;
-                  // this.menus = this.menusName;
-                  alert(2);
-                }
+            this.menus.forEach(function(ele, index) {
+              ele.selected = false;
+              if (ele.children) {
+                ele.children.forEach(function(item, index) {
+                  item.selected = false;
+                });
               }
-            };
-            alert(3);
-            console.log('//////////////////////////////////');
-            console.log(this.menus);
-            console.log(this.menusName);
-            this.$Message.success(res.data.message);
+            });
+            this.settingQx(res.data.result)
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           // this.$Message.error('请求超时');
-          console.log('请求超时');
+          console.log(error);
         })
     },
-    findByRid(index, row) { //查询角色
-      // alert(2320);
-      console.log(row);
+    findByRid(row) { //查询角色
+      this.rowName = row.roleName;
       this.roleId = row.id; //保存角色id
-      this.findResourceByRid(row.id);
-      // this.rolTabData_R.forEach(item => {
-      //   item.check = true;
-      // });
+      this.findResourceByRid(this.roleId);
     },
     authorizationBtn() {
-      this.menuIds = this.ResourceArr.join(",");
-      if (this.menuIds == '' || this.roleId == '') {
+      if (this.roleId == '' || this.menus == '') {
         this.$Message.warning('请先选择一个角色并分配权限后再试');
         return;
       };
-      this.authorization(this.menuIds);
+      this.authorization();
     },
-    authorization(menuIds) { //角色授权 api
-      this.$http.post(this.api+'/role/authorization', {
+    authorization() { //角色授权 api
+      var arr = [];
+      this.menus.map(item => {
+        if (item.selected) {
+          arr.push(item.id)
+        }
+        if (item.children) {
+          item.children.map(list => {
+            if (list.selected) {
+              arr.push(list.id)
+            }
+          })
+        }
+      })
+      var menuIds = arr.join(",")
+
+      this.$http.post(this.api + '/role/authorization', {
         roleId: this.roleId,
         menuIds: menuIds,
         mid: this.merchants[0].id
       })
         .then(res => {
           if (res.status == '200') {
-            console.log(res.data);
-            this.findResourceByMid();
             this.$Message.success(res.data.message);
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
@@ -410,7 +406,8 @@ export default {
     },
     editSelecttionTab(index, row) { //编辑
       // alert(1002);
-      row.isAdmin = !row.isAdmin;
+
+      // row.isAdmin = !row.isAdmin;
     },
     handleSelectionChange(val) { //选中的数据
       this.multipleSelection = val;

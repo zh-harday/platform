@@ -41,12 +41,16 @@ export function clearValue(obj) {
 }
 
 export function getNodes(arr) {
-    // console.log(arr);
+    console.log(arr);
     var nodes = [];
     arr.map(function (node) {
         if (node.parentId === '0') {
             nodes.push(node)
-        } else {
+        }
+    })
+
+    arr.map(function (node) {
+        if (node.parentId !== '0') {
             pushNode(node, nodes)
         }
     })
@@ -69,10 +73,6 @@ function pushNode(node, pNodes) {
                 // alert(222)
                 pNode.children.push(node);
             }
-        } else {
-            if (pNode.children) {
-                pushNode(node, pNode.children)
-            }
-        }
+        } 
     })
 }
