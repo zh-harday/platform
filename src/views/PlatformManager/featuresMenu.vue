@@ -66,7 +66,7 @@
                             <div>
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(item)">
                                     <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(item)">
+                                <el-button style="color:#5c6b77" type="text" @click="editMenu(item,parent)">
                                     <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                 <el-button style="color:#5c6b77" type="text" @click="deletMenuA(item)">
                                     <Icon size="20" type="trash-a"></Icon>
@@ -90,7 +90,7 @@
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(scope.row)">
                                     <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
                                 </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row)">
+                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row,children)">
                                     <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
                                 </el-button>
                                 <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.$index, item.children)">
@@ -152,6 +152,7 @@ export default {
             checked: true,
             menus: [],
             rowMenuID: {}, //添加菜单pid
+            parentId: 0,
             featuresTabData: [
                 {
                     name: "日常办公",
@@ -178,9 +179,7 @@ export default {
     },
     methods: {
         sysMenuQueryList() { //查询功能菜单列表数据
-            this.$http.post(this.api + '/sysMenu/queryList', {
-
-            })
+            this.$http.post(this.api + '/sysMenu/queryList', {})
                 .then(res => {
                     if (res.status == '200') {
                         console.log(res.data.result);
@@ -215,8 +214,14 @@ export default {
             this.addFormData = new_addFormData;
             this.dialogFormVisible1 = true;
         },
-        editMenu(row) { //编辑
+        editMenu(row,parent) { //编辑
             console.log(row)
+            if(parent == 'parent'){
+                this.parentId = 0;
+                alert(666);
+            } else {
+                this.parentId = false;
+            };
             this.rowMenuID = row;
             this.dialogFormVisible1 = true;
             this.isEdit = true;
@@ -244,6 +249,7 @@ export default {
             console.log(this.addMenusFormData);
             if (this.isEdit) {
                 this.updateMenu();
+                this.dialogFormVisible1 = false;
                 return;
             };
             this.$http.post(this.api + '/sysMenu/save', {
@@ -274,17 +280,19 @@ export default {
         },
         updateMenu() { //修改菜单信息
             this.$http.post(this.api + '/sysMenu/update', {
+                id: this.rowMenuID.id,
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
                 "icon": this.rowMenuID.icon,
                 "sort": 1,
-                "parentId": this.rowMenuID.id,
+                "parentId": this.parentId,
                 "type": this.rowMenuID.type,
                 "code": 'sys_menu',
             })
                 .then(res => {
                     if (res.status == '200') {
+                        this.sysMenuQueryList();
                         this.$Message.success(res.data.message);
                     } else if (res.status == '403') {
                         this.$Message.error(res.data.message);

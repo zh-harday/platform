@@ -34,8 +34,8 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
-                <el-form-item label="发布人">
-                  <el-input v-model="newsFormData.publisher" auto-complete="off"></el-input>
+                <el-form-item label="发布人" prop="publisher">
+                  <el-input :disabled="1" v-model="newsFormData.publisher" auto-complete="off"></el-input>
                 </el-form-item>
               </div>
             </el-col>
@@ -76,7 +76,8 @@
           <template scope="scope">
             <span class="cursor" v-if="scope.row.pushType">{{ scope.row.seedMsgDate }}</span>
             <span v-if="!scope.row.pushType" class="cell-edit-input">
-              <el-input v-model="scope.row.seedMsgDate" placeholder=""></el-input>
+              <el-date-picker @change="getDateseedMsgDate" v-model="scope.row.seedMsgDate" type="date" auto-complete="off" placeholder="选择日期" :picker-options="pickerOptions0">
+              </el-date-picker>
             </span>
           </template>
         </el-table-column>
@@ -85,7 +86,6 @@
         <el-table-column label="操作" align="center">
           <template scope="scope">
             <el-button v-if="scope.row.pushType" :disabled="scope.row.pushType == '已发布'" @click="checkEdit(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
-            <el-button v-if="!scope.row.pushType" :disabled="scope.row.pushType" @click="pushSysMessageBtn(scope.$index,scope.row)" type="primary" size="small">保 存</el-button>
             <el-button type="primary" size="small" @click="delBtn(scope.row)">删 除</el-button>
             <el-button type="primary" size="small" :disabled="scope.row.pushType == '已发布'" @click="releaseSysMessageBtn(scope.row)">发 布</el-button>
           </template>
@@ -101,9 +101,11 @@
 
 
 <script>
+import { changeDate } from 'common/js/config'
 export default {
   computed: {
     user() {
+      // alert(555);
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
       return {
@@ -113,7 +115,9 @@ export default {
     }
   },
   created() {
-    this.getSelectSysMessageList(1);
+    this.getSelectSysMessageList(1, 10);
+    this.newsFormData.publisher = this.user.userInfor.name;
+    console.log(this.newsFormData.publisher);
   },
   data() {
     return {
@@ -126,7 +130,8 @@ export default {
         publisher: '', //发布人
         publisherDate: '', //发布日期
         status: "", //状态
-        editFlag: false
+        editFlag: false,
+        msgId: '' //消息id
       },
       page: {
         pageNum: '', //当前页码
@@ -137,15 +142,16 @@ export default {
       },
       newsFormVisible: false,
       isRelease: false,
-      edit: "编辑"
+      edit: false
     }
   },
   methods: {
     newAdd() { //Add New Row
+      this.edit = false;
       let new_newsFormData = {
         title: '', //标题
         content: "", //内容
-        publisher: '', //发布人
+        publisher: this.user.userInfor.name, //发布人
         publisherDate: '', //发布日期
         status: "", //状态
         editFlag: false
@@ -167,41 +173,95 @@ export default {
       this.newsFormData = {};
       this.newsFormVisible = false;
     },
-    checkEdit(index, row) {
+    checkEdit(index, row) { //编辑按钮
       console.log(row);
-      row.pushType = !row.pushType;
+      this.edit = true;
+      this.newsFormData.title = row.msgTitle;
+      this.newsFormData.content = row.msgContent;
+      this.newsFormData.publisher = row.seedUserName;
+      this.newsFormData.publisherDate = row.createDate;
+      this.newsFormData.seedManageId = row.seedManageId;
+      this.newsFormData.msgId = row.id;
+      this.newsFormVisible = 1;
     },
     getDateValue(value) {
       this.newsFormData.publisherDate = value;
     },
+    getDateseedMsgDate(val) {
+      // this.newsFormData.publisherDate = value;
+    },
+    handleSizeChange(pageSize) {
+      console.log(pageSize);
+      this.getSelectSysMessageList(1, pageSize);
+    },
     handleCurrentChangeBtn(pages) { //分页按钮
-      this.getSelectSysMessageList(pages);
+      this.getSelectSysMessageList(pages, 10);
     },
     releaseSysMessageBtn(row) { //列表发布按钮
       console.log(row);
       this.pushSysMessage(row.id, row.seedManageId);
     },
     pushSysMessageBtn(index, row) { //列表保存按钮
+      console.log('**************************');
       console.log(row);
       row.pushType = !row.pushType;
-      this.saveSysMessage(row.msgTitle, row.seedManageId, row.msgContent, row.seedMsgDate);
+      // console.log(row.seedMsgDate);
+      let seedMsgDate = changeDate(row.seedMsgDate);
+      console.log(seedMsgDate);
+      this.saveSysMessageTab(row.msgTitle, row.seedManageId, row.msgContent, seedMsgDate);
+    },
+    saveSysMessageTab(pushType) { //编辑保存/发布信息 api
+      this.$http.post(this.api + '/sysManage/updateSysMessage', {
+        id: this.newsFormData.msgId,
+        msgTitle: this.newsFormData.title,
+        seedManageId: this.newsFormData.seedManageId,
+        msgContent: this.newsFormData.content,
+        createDate: this.newsFormData.publisherDate,
+        pushType: pushType
+      })
+        .then(res => {
+          if (res.status == '200') {
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.getSelectSysMessageList(1, 10);
+              this.$Message.success(res.data.message);
+            } else if (res.data.status == '155') {
+              this.$Message.error(res.data.message);
+            }
+          } else if (res.status == '403') {
+            this.$Message.error(res.data.message);
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+        })
     },
     delBtn(row) { //删除列表信息按钮
       this.deteleSysMessage(row.id);
     },
     saveDialogBtn() { //dialog save btn
-      this.messageInfo.title = this.newsFormData.title;
-      this.messageInfo.sendId = this.user.userInfor.id;
-      this.messageInfo.msgContent = this.newsFormData.content;
-      this.messageInfo.creatDate = this.newsFormData.publisherDate;
-      this.saveSysMessage(this.messageInfo);
+      if (this.edit) {
+        alert('bj--save');
+        this.saveSysMessageTab(2);
+      } else {
+        console.log(this.newsFormData);
+        this.messageInfo.title = this.newsFormData.title;
+        this.messageInfo.sendId = this.user.userInfor.id;
+        this.messageInfo.msgContent = this.newsFormData.content;
+        this.messageInfo.creatDate = this.newsFormData.publisherDate;
+        this.saveSysMessage(this.messageInfo);
+      };
+      this.newsFormVisible = 0;
     },
     seleaseDialogBtn() { //dialog selease btn
-      this.messageInfo.title = this.newsFormData.title;
-      this.messageInfo.sendId = this.user.userInfor.id;
-      this.messageInfo.msgContent = this.newsFormData.content;
-      this.messageInfo.creatDate = this.newsFormData.publisherDate;
-      this.pushSysMessage(this.messageInfo);
+      if (this.edit) { //编辑发布
+        alert('bj--release');
+        this.saveSysMessageTab(1);
+        this.newsFormVisible = 0;
+      } else { //编辑保存
+        this.pushAndSaveSysMessage();
+      };
+      this.newsFormVisible = 0;
     },
     deteleSysMessage(id) { //删除列表消息 api
       this.$http.post(this.api + '/sysManage/deteleSysMessage', {
@@ -222,11 +282,11 @@ export default {
           this.$Message.error("请求超时");
         })
     },
-    getSelectSysMessageList(pages) { //获取平台端信息列表
+    getSelectSysMessageList(pages, pageSize) { //获取平台端信息列表
       this.$http.post(this.api + '/sysManage/selectSysMessageList', {
         seedManageId: this.user.userInfor.id,
         page: pages,
-        pageSize: 10
+        pageSize: pageSize
       })
         .then(res => {
           if (res.status == '200') {
@@ -256,7 +316,7 @@ export default {
           console.log('请求超时');
         })
     },
-    saveSysMessage(messageInfo) { //列表保存按钮信息 api
+    saveSysMessage(messageInfo) { //diglog 新增保存按钮信息 api
       this.$http.post(this.api + '/sysManage/saveSysMessage', {
         "msgTitle": messageInfo.title,
         "seedManageId": messageInfo.sendId,
@@ -267,7 +327,7 @@ export default {
           if (res.status == '200') {
             if (res.data.status == '200') {
               console.log(res.data);
-              this.getSelectSysMessageList(1);
+              this.getSelectSysMessageList(1,10);
               this.$Message.success(res.data.message);
             } else if (res.data.status == '155') {
               this.$Message.error(res.data.message);
@@ -282,7 +342,7 @@ export default {
           console.log('请求超时');
         })
     },
-    pushSysMessage(id, sendId) { //列表发布信息 api
+    pushSysMessage(id, sendId) { //diglog 发布信息 api
       this.$http.post(this.api + '/sysManage/pushSysMessage', {
         id: id,
         seedManageId: sendId
@@ -307,19 +367,19 @@ export default {
           console.log('请求超时');
         })
     },
-    pushAndSaveSysMessage(messageInfo) { //dialog 发布信息 api
+    pushAndSaveSysMessage() { //dialog 编辑发布信息 api
       this.$http.post(this.api + '/sysManage/pushAndSaveSysMessage', {
-        "msgTitle": messageInfo.title,
-        "seedManageId": messageInfo.sendId,
-        "msgContent": messageInfo.msgContent,
-        "createDate": messageInfo.creatDate
+        "msgTitle": this.newsFormData.title,
+        "seedManageId": this.user.userInfor.id,
+        "msgContent": this.newsFormData.content,
+        "createDate": this.newsFormData.publisherDate
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
               alert(555);
               console.log(res.data);
-              this.getSelectSysMessageList(1);
+              this.getSelectSysMessageList(1,10);
               this.$Message.success(res.data.message);
             } else if (res.data.status == '155') {
               this.$Message.error(res.data.message);

@@ -21,7 +21,7 @@
         <el-table-column prop="nickname" label="昵称" align="center" width="">
         </el-table-column>
         <!-- <el-table-column prop="inBusiness" label="所在企业" align="center" width="185">
-                    </el-table-column> -->
+                            </el-table-column> -->
         <el-table-column prop="emil" label="邮箱" align="center" width="">
         </el-table-column>
         <el-table-column prop="createTime" label="注册日期" align="center" width="">
@@ -29,7 +29,7 @@
         <el-table-column prop="disables" label="状态" align="center" width="">
         </el-table-column>
         <!-- <el-table-column prop="remarks" label="备注" align="center" width="185">
-                    </el-table-column> -->
+                            </el-table-column> -->
         <el-table-column :fixed="right" label="操作" align="center" width="">
           <template scope="scope">
             <el-button :disabled="scope.row.disables == '锁定'" @click="locking(scope.$index,scope.row,0)" type="primary" size="small">锁 定</el-button>
@@ -37,6 +37,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChangeBtn" :current-page="page.pageNum" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="page.total">
+        </el-pagination>
+      </div>
     </div>
   </section>
 </template>
@@ -55,28 +59,33 @@ export default {
     }
   },
   created() {
-    this.customerMangList();
+    this.customerMangList('', 1, 10);
   },
   data() {
     return {
-      memberMTabData: [] //会员管理列表数据
+      memberMTabData: [], //会员管理列表数据
+      page: {
+        pageNum: '', //当前页码
+        total: '', //数据总数
+        pageSize: '', //每页条数
+        navigatepageNums: '', //页数
+        current: '', //当前页码
+      },
     }
   },
   methods: {
     searchHandling() {
-      let searchValue = this.input2;
-      console.log(this.input2);
-      this.customerMangList();
+      this.customerMangList(this.input2, 1, 10);
     },
     locking(index, row, type) { //锁定
       // row.status = '锁定';
-      if(type == '0'){
-        this.resetPass(row.id,0);
-      } else if(type == '1'){
-        this.resetPass(row.id,1);
+      if (type == '0') {
+        this.resetPass(row.id, 0);
+      } else if (type == '1') {
+        this.resetPass(row.id, 1);
       }
     },
-    resetPass(id,type) { //锁定/启用 平台会员 api
+    resetPass(id, type) { //锁定/启用 平台会员 api
       this.$http.post(this.api + '/user/resetPass', {
         id: id,
         disables: type
@@ -97,12 +106,21 @@ export default {
           console.log('请求超时');
         })
     },
-    customerMangList() { //查询平台会员列表数据
+    handleSizeChange(pageSize) {
+      console.log(pageSize);
+      this.customerMangList('',1,pageSize);
+    },
+    handleCurrentChangeBtn(pageNum) { //分页按钮
+      // alert(555);
+      console.log(pageNum);
+      this.customerMangList('',pageNum, 10);
+    },
+    customerMangList(name, page, pageSize) { //查询平台会员列表数据
       this.$http.post(this.api + '/user/queryUserInfo', {
-        // "name": this.user.userInfor.name,
+        "name": name,
+        "page": page,
+        "pageSize": pageSize
         // "disables": 1,
-        "page": 1,
-        "pageSize": 10
       })
         .then(res => {
           if (res.status == '200') {
@@ -118,6 +136,10 @@ export default {
                 item.createTime = getDate(item.createTime);
               }, this);
               this.memberMTabData = res.data.result.list;
+              this.page.pageNum = res.data.result.pageNum; //当前页码
+              this.page.total = res.data.result.total; //数据总数
+              this.page.pageSize = res.data.result.pageSize; //每页条数
+              this.page.navigatepageNums = res.data.result.navigatepageNums.length; //页数长度
               this.$Message.success(res.data.message);
             }
 

@@ -5,7 +5,7 @@
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="" icon="search" v-model="input2" :on-icon-click="handleIconClick">
+            <el-input placeholder="请按客户名称进行查询" icon="search" v-model="input2" :on-icon-click="handleIconClick">
             </el-input>
           </div>
         </el-col>
@@ -62,13 +62,16 @@
             </el-col>
           </el-row>
           <el-row :gutter="20">
-            <el-col :span="12">
-              <div class="grid-content bg-purple-dark">
-                <el-form-item prop="officeAddress" label="办公地址" :label-width="formLabelWidth">
-                  <el-input v-model="addCustomerFormData.officeAddress" auto-complete="off"></el-input>
-                </el-form-item>
-              </div>
-            </el-col>
+            <!-- <el-col :span="12">
+                      <div class="grid-content bg-purple-dark">
+                        <el-form-item prop="officeAddress" label="办公地址" :label-width="formLabelWidth">
+                          <el-select @change="typeSelect" v-model="addCustomerFormData.officeAddress" placeholder="请选择" size="100%">
+                            <el-option v-for="item in options" :key="item.id" :label="item.typeName" :value="item.id">
+                            </el-option>
+                          </el-select>
+                        </el-form-item>
+                      </div>
+                    </el-col> -->
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
                 <el-form-item prop="companyEmail" label="公司邮箱" :label-width="formLabelWidth">
@@ -97,7 +100,7 @@
             <el-col :span="24">
               <div class="grid-content bg-purple-dark">
                 <el-form-item prop="type" label="类型" :label-width="formLabelWidth">
-                  <el-select @change="typeSelect" v-model="type" placeholder="请选择" size="100%">
+                  <el-select @change="typeSelect" v-model="addCustomerFormData.type" placeholder="请选择" size="100%">
                     <el-option v-for="item in options" :key="item.id" :label="item.typeName" :value="item.id">
                     </el-option>
                   </el-select>
@@ -227,6 +230,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChangeBtn" :current-page="page.pageNum" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="page.total">
+        </el-pagination>
+      </div>
     </div>
   </section>
 </template>
@@ -245,11 +252,12 @@ export default {
     }
   },
   created() {
-    this.queryInfo();
+    this.queryInfo(1, 10);
     // this.beforeUpdate(); 
   },
   data() {
     return {
+      edit: false,
       a: 1,
       type: '',
       industrys: [], //行业列表
@@ -277,41 +285,44 @@ export default {
         lrIDNumber: "", //法人代表身份证号
         address: "", //*详细地址
         editFlag: false, //是否可编辑
+        id: '',
       },
       isDisabled: false,
       locked: false,
       addCustomerDialogFormVisible: false,
       formLabelWidth: '120px',
+      page: {
+        pageNum: '', //当前页码
+        total: '', //数据总数
+        pageSize: '', //每页条数
+        navigatepageNums: '', //页数
+        current: '', //当前页码
+      },
     }
   },
   methods: {
-    NewObj() {
+    handleIconClick() {
+      this.queryInfo(1,10,this.input2);
     },
     submitForm(event) { //提交上传文件到服务器
       // alert(5656);
       event.preventDefault();
       let formData = new FormData();
-      // formData.append('file', this.file);
       formData.append('files', this.$refs.avatarInput.files[0]);
+      // formData.append('files', this.file);
       console.log(formData);
-      console.log(this.file);
       let config = {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       };
       this.$http.post(this.api + '/files/upload', formData, config)
-        .then(function(res) {
+        .then(res => {
+          alert(999);
           if (res.status == '200') {
             if (res.data.status == '200') {
-              alert(2323);
-              console.log(res.data.message);
-              // let url = res.data.message;
-              this.fileAddress = res.data.message;
-              // this.address = url;
-              // console.log(url);
-              console.log(this.a);
-              console.log(this.fileAddress);
+              console.log(res.data);
+              this.fileAddress = res.data.filePath;
               this.$Message.success(res.data.message);
             }
           }
@@ -337,6 +348,32 @@ export default {
       return value;
     },
     addCustomer() { //Add 新客户
+      this.edit = false;
+      let new_addCustomerFormData = {
+        clientName: '', //客户名称
+        account: '', //账号
+        openDate: getSysDate(), //开通日期
+        industry: '', //行业
+        expiryDate: '', //到期日期
+        type: '', //类型
+        status: '启用', //状态
+        url: '', //上传文件地址
+        officeAddress: "", //办公地址
+        companyEmail: "", //公司邮箱
+        contactPerson: "", //联系人
+        contactPhone: "", //联系电话
+        relatedDoc: "", //相关文档
+        remarks: "", //备注
+        uscc: "", //*统一社会信用代码
+        legalRepresen: "", //法人代表
+        lrIDNumber: "", //法人代表身份证号
+        address: "", //*详细地址
+        editFlag: false, //是否可编辑
+        id: ''
+      };
+      this.fileAddress = '';
+      this.file = {};
+      this.addCustomerFormData = new_addCustomerFormData;
       this.queryList();
       this.industryS();
       // this.addCustomerFormData = new_addCustomerFormData;
@@ -347,31 +384,34 @@ export default {
       // this.$refs.addCustomerFormData.resetFields();
       this.addCustomerDialogFormVisible = false;
     },
-    EditBtn(index, row) { //编辑  
+    EditBtn(index, row) { //编辑
+      this.edit = true;
       console.log(row);
+      this.addCustomerFormData.id = row.id;
       this.queryList();
       this.industryS();
       this.queryObject(row.id);
       this.addCustomerDialogFormVisible = true;
     },
-    locking(index, row,num) { //锁定
+    locking(index, row, num) { //锁定
       row.status = "锁定";
-      if(num == '0'){ //锁定
-        this.enableOrLock(row.id,num);
+      if (num == '0') { //锁定
+        this.enableOrLock(row.id, num);
       } else { //启用
-        this.enableOrLock(row.id,num);
+        this.enableOrLock(row.id, num);
       }
     },
     saveCustomerDialogFormBtn() { //新增客户按钮
-      console.log(this.addCustomerFormData);
+      console.log(this.addCustomerFormData.id);
       this.editMerchant();
+      console.log(this.addCustomerFormData);
       this.addCustomerDialogFormVisible = false;
     },
     getIndustryValue(value) { //获取行业数据
       console.log(value);
       this.addCustomerFormData.industry = value;
     },
-    enableOrLock(id,type) { //锁定/启用 客户
+    enableOrLock(id, type) { //锁定/启用 客户
       this.$http.post(this.api + '/merchant/enableOrLock', {
         "id": id,
         "disables": type
@@ -405,14 +445,12 @@ export default {
               this.addCustomerFormData.openDate = res.data.result.startTime; //开通时间
               this.addCustomerFormData.expiryDate = res.data.result.endTime; //结束时间
               this.file.name = res.data.result.merchantFlie; //结束时间
-
-              this.addCustomerFormData.officeAddress = res.data.result.officeAddress; //办公地址
               this.addCustomerFormData.companyEmail = res.data.result.email; //公司邮箱
 
               this.addCustomerFormData.contactPerson = res.data.result.contactUser; //联系人
               this.addCustomerFormData.contactPhone = res.data.result.contactPhone; //联系电话
-              // this.type = res.data.result.merchantTypeId; //类型
-              // this.addCustomerFormData.industry = res.data.result.industry; //行业
+              this.addCustomerFormData.type = res.data.result.merchantTypeId; //类型
+              this.addCustomerFormData.industry = res.data.result.industry; //行业
               this.addCustomerFormData.remarks = res.data.result.info; //备注
               this.addCustomerFormData.uscc = res.data.result.socialCode; //统一社会信用代码
               this.addCustomerFormData.legalRepresen = res.data.result.representative; //法人代表
@@ -427,8 +465,21 @@ export default {
           this.$Message.error("请求超时");
         })
     },
-    queryInfo() { //查询客户列表数据 api
-      this.$http.post(this.api + '/merchant/queryInfo', {})
+    handleSizeChange(pageSize) {
+      console.log(pageSize);
+      this.queryInfo(1, pageSize);
+    },
+    handleCurrentChangeBtn(pageNum) { //分页按钮
+      // alert(555);
+      console.log(pageNum);
+      this.queryInfo(pageNum, 10);
+    },
+    queryInfo(pageNum, pageSize,merchantName) { //查询客户列表数据 api
+      this.$http.post(this.api + '/merchant/queryInfo', {
+        merchantName: merchantName,
+        page: pageNum, //当前页码
+        pageSize: pageSize //每页显示的条数
+      })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
@@ -441,6 +492,10 @@ export default {
                 }
               }, this);
               this.addCustomerTabData = res.data.result.list;
+              this.page.pageNum = res.data.result.pageNum; //当前页码
+              this.page.total = res.data.result.total; //数据总数
+              this.page.pageSize = res.data.result.pageSize; //每页条数
+              this.page.navigatepageNums = res.data.result.navigatepageNums.length; //页数长度
               this.$Message.success(res.data.message);
             }
           } else if (res.status == '403') {
@@ -486,8 +541,9 @@ export default {
           this.$Message.error(res.data.message);
         });
     },
-    editMerchant() { //新增客户 api
+    editMerchant(id) { //新增客户 api
       this.$http.post(this.api + '/merchant/editMerchant', {
+        id: this.addCustomerFormData.id,
         "merchantName": this.addCustomerFormData.clientName,
         "startTime": this.addCustomerFormData.openDate,
         "endTime": this.addCustomerFormData.expiryDate,
@@ -495,19 +551,23 @@ export default {
         "contactUser": this.addCustomerFormData.contactPerson,
         "contactPhone": this.addCustomerFormData.contactPhone,
         "merchantTypeId": this.addCustomerFormData.type,
-        "merchantFlie": 'http://47.90.120.190:8086/group1/M00/00/02/rB9VtFnLB_SARAm5ABA0syEEsfE400.png',
+        "merchantFlie": this.fileAddress,
         "info": this.addCustomerFormData.remarks,
         "socialCode": this.addCustomerFormData.uscc,
         "representative": this.addCustomerFormData.legalRepresen,
         "address": this.addCustomerFormData.address,
+        "email": this.addCustomerFormData.companyEmail
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
               console.log(res.data);
+              this.queryInfo(1, 10);
               this.$Message.success(res.data.message);
             }
           } else if (res.data.status == '403') {
+            this.$Message.error(res.data.message);
+          } else if (res.data.status == '1006') {
             this.$Message.error(res.data.message);
           }
         })

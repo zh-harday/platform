@@ -68,12 +68,12 @@
               </div>
             </el-col>
             <!-- <el-col :span="12">
-                            <div class="grid-content bg-purple-dark">
-                              <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
-                                <el-input v-model="userListFormData.pass" auto-complete="off"></el-input>
-                              </el-form-item>
-                            </div>
-                          </el-col> -->
+                              <div class="grid-content bg-purple-dark">
+                                <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
+                                  <el-input v-model="userListFormData.pass" auto-complete="off"></el-input>
+                                </el-form-item>
+                              </div>
+                            </el-col> -->
           </el-row>
           <div class="inforBackg">个人信息</div>
           <el-row :gutter="20">
@@ -174,8 +174,8 @@ export default {
       this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
       this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
       return {
-        userInfor : this.$store.state.login.userInfor,
-        merchants : this.$store.state.login.merchants
+        userInfor: this.$store.state.login.userInfor,
+        merchants: this.$store.state.login.merchants
       }
     },
   },
@@ -294,8 +294,8 @@ export default {
         console.log(this.userListFormData);
         this.saveUser();
       } else {
-        alert('bj');
-        console.log(this.userListFormData);
+        // alert('bj');
+
         for (let item in this.userListFormData) {
           if (this.userListFormData.six == '女') {
             this.userListFormData.six = '0';
@@ -303,11 +303,13 @@ export default {
             this.userListFormData.six = '1';
           }
         };
+        this.userListFormData.roleName = this.userListFormData.roleName.join(",");
+        // console.log(this.userListFormData.roleName);
         this.updateUser();
+        console.log(this.userListFormData);
       };
-      console.log(this.userListFormData);
       // this.updateUser();
-      this.userListFormData = {};
+      // this.userListFormData = {};
       this.userListDialogFormVisible = false;
     },
     getRoleName(value) {
@@ -322,7 +324,7 @@ export default {
       this.add = false;
       this.userListDialogFormVisible = true;
       this.queryUser(row.userId); //用户详情
-      this.queryUserListByUM(row.userId,row.umId); //查询企业角色列表
+      this.queryUserListByUM(row.userId, row.umId); //查询企业角色列表
 
     },
     // saveUserListTabData(index, row) { //保存
@@ -359,18 +361,19 @@ export default {
           // console.log('请求超时');
         })
     },
-    queryUserListByUM(id,umid) { //查询企业角色列表 api
-    if(id == '1'){
-      id = this.userId.merchants[0].id;
-    };
+    queryUserListByUM(id, umid) { //查询企业角色列表 api
+      if (id == '1') {
+        id = this.userId.merchants[0].id;
+      };
       this.$http.post(this.api + '/role/queryRoleList', {
-        merchantId: id
+        // merchantId: id
+        merchantId: this.userId.merchants[0].id
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
-              if(umid){
-                alert('umid');
+              if (umid) {
+                // alert('umid');
                 this.queryUserRoleList(umid); //查询用户拥有角色列表
               };
               console.log('企业角色列表');
@@ -388,13 +391,13 @@ export default {
     },
     queryUserRoleList(umid) { //查询用户拥有角色列表 api
       this.$http.post(this.api + '/role/queryRoleListByUM', {
-        umid: umid
+        umid: umid //企业用户中间表id
       })
         .then(res => {
           if (res.status == '200') {
             console.log('用户角色列表');
             console.log(res.data.result);
-            for(let userRoleList in res.data.result){
+            for (let userRoleList in res.data.result) {
               this.roleList.push(res.data.result[userRoleList]);
               console.log(userRoleList);
             };
@@ -411,7 +414,6 @@ export default {
     },
     queryUser(id) { //查询用户详情列表数据 api
       this.$http.post(this.api + '/user/queryUser', {
-      // this.$http.post(this.api + '/user/queryUserInfo', {
         "userId": id
       })
         .then(res => {
@@ -438,20 +440,18 @@ export default {
               this.userListFormData.emil = res.data.result.emil;
               this.$Message.success(res.data.message);
             }
-
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-          console.log('请求超时');
         })
     },
     queryRoleListByUM(num) { //查询平台所有用户列表 api
       this.$http.post(this.api + '/user/queryUserByMid', {
         "merchantId": this.userId.merchants[0].id,
-        "userName": this.userId.userInfor.name,
+        // "userName": this.userId.userInfor.name,
         "lockValue": num,
       })
         .then(res => {
@@ -469,7 +469,7 @@ export default {
     },
     queryUser(id) { //查询用户详情列表数据 api
       this.$http.post(this.api + '/user/queryUser', {
-      // this.$http.post(this.api + '/user/queryUserInfo', {
+        // this.$http.post(this.api + '/user/queryUserInfo', {
         "userId": id
       })
         .then(res => {
@@ -512,7 +512,7 @@ export default {
         "umId": this.userListFormData.umId,
         "name": this.userListFormData.name,
         "number": this.userListFormData.number,
-        "pass": this.userListFormData.pass,
+        "pass": '123456',
         "birthday": this.userListFormData.birthday,
         "six": this.userListFormData.six,
         "phone": this.userListFormData.phone,
@@ -526,7 +526,6 @@ export default {
               this.queryRoleListByUM('');
               this.$Message.success(res.data.message);
             }
-
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
@@ -536,6 +535,7 @@ export default {
         })
     },
     saveUser() { //保存新增用户信息
+      // alert(666);
       this.$http.post(this.api + '/user/saveUser', {
         "mId": this.userId.merchants[0].id,
         "name": this.userListFormData.name,
@@ -550,6 +550,7 @@ export default {
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
+              // alert(666);
               console.log(res.data);
               this.queryRoleListByUM('');
               this.$Message.success(res.data.message);

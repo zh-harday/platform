@@ -199,11 +199,11 @@ export default {
         })
     },
     findResourceByMid() { //查询企业权限列表
-      this.$http.post(this.api + '/user/findResourceByMid', {
-        merchantId: this.merchants[0].id
-      })
+      this.$http.post(this.api + '/sysMenu/queryList', {})
         .then(res => {
           if (res.status == '200') {
+            // alert(555);
+            console.log(res.data);
             this.queryRoleListByUM()
             this.menus = getNodes(res.data.result);
             this.menus.forEach(function(ele, index) {
@@ -292,7 +292,6 @@ export default {
         arrs[i] = this.menus[i];
       }
       this.menus.map((item) => {
-
         if (item.children) {
           item.children.map((list) => {
             arr.map((ele) => {

@@ -5,7 +5,7 @@
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="请按项目名称/行业/轮次/项目所在地搜索" select-when-unmatched="true" icon="search" v-model="input2" :on-icon-click="searchHandling">
+            <el-input placeholder="请按项目名称进行搜索" select-when-unmatched="true" icon="search" v-model="input2" :on-icon-click="searchHandling">
             </el-input>
           </div>
         </el-col>
@@ -321,6 +321,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChangeBtn" :current-page="page.pageNum" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="page.total">
+        </el-pagination>
+      </div>
     </div>
   </section>
 </template>
@@ -339,7 +343,7 @@ export default {
     }
   },
   created() {
-    this.selectCompany('', '', '', '');
+    this.selectCompany('', 1, 10);
   },
   data() {
     return {
@@ -364,7 +368,7 @@ export default {
         usermarket: "", //用户市场
         businessModel: "", //商业模式
         OperationData: "", //运营数据
-        businessPlan: "http://47.90.120.190:8086/group1/M00/00/02/rB9VtFnMxbyAK84jAAIwMA2mSNw677.png", //商业计划书url
+        businessPlan: "", //商业计划书url
       },
       finance: [], //融资经历 Tab
       financeF: { //融资经历 Form
@@ -396,6 +400,13 @@ export default {
       AddTeamDialogFormVisible: false, //添加团队成员 Dialog
       leaderAssistantFormDialog_align: 'left',
       formLabelWidth: '120px',
+      page: {
+        pageNum: '', //当前页码
+        total: '', //数据总数
+        pageSize: '', //每页条数
+        navigatepageNums: '', //页数
+        current: '', //当前页码
+      },
     }
   },
   methods: {
@@ -411,17 +422,13 @@ export default {
         }
       };
       this.$http.post(this.api + '/files/upload', formData, config)
-        .then(function(res) {
+        .then((res) => {
           if (res.status == '200') {
             if (res.data.status == '200') {
               alert(2323);
-              console.log(res.data.message);
-              // let url = res.data.message;
-              this.fileAddress = res.data.message;
-              // this.address = url;
-              // console.log(url);
-              // console.log('///////////////////////////');
-              console.log(this.fileAddress);
+              console.log(res.data);
+              this.productInfo.businessPlan = res.data.filePath;
+              console.log(this.productInfo.businessPlan);
               this.$Message.success(res.data.message);
             } else if (res.data.status == '403') {
               this.$Message.error(res.data.message);
@@ -445,6 +452,7 @@ export default {
       this.company.startdate = value;
     },
     getDate2(value) {
+      // alert(333);
       console.log(value);
       this.basicInfo.startdate = value;
     },
@@ -452,11 +460,11 @@ export default {
       console.log(value);
       this.financeF.date = value;
     },
-    addLeaderAssistantForm(n) { //添加平台云项目btn
+    addLeaderAssistantForm(n) { //添加平台云项目 Addbtn
       // alert(n);
       if (n == 1) {
         this.select2Menu();
-        // alert(1);
+        // alert(11);
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
       } else if (n == 2) {
         // alert(2);
@@ -470,7 +478,7 @@ export default {
         this.financeF = new_financeF;
         this.financingDialogFormVisible = !this.financingDialogFormVisible;
       } else if (n == 3) {
-        // alert(n);
+        // alert(3);
         let new_teamintroF = {
           name: "", //姓名
           position: "", //职位
@@ -483,13 +491,15 @@ export default {
     },
     leaderAssistantFormSaveBtn(n) { //确定
       if (n == 1) {
-        // alert(1);
+        alert(1111);
         console.log('添加团队成员信息');
         console.log(this.company);
         console.log(this.productInfo);
         console.log(this.finance);
         console.log(this.teamintro);
         console.log(this.basicInfo);
+        console.log(this.productservice);
+        this.insertMessage();
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
         this.company = {};
         this.productInfo = {};
@@ -524,9 +534,7 @@ export default {
       // rows.splice(index, 1);
     },
     searchHandling() { //搜索
-      let searchValue = this.input2;
-      console.log(this.input2);
-      this.selectCompany(searchValue, searchValue, searchValue, searchValue);
+      this.selectCompany(this.input2, 1, 10);
     },
     select2Menu() { //查询行业and所在地数据
       this.$http.post(this.api + '/dictionaryController/select2Menu', { //数据字典=>行业
@@ -602,12 +610,20 @@ export default {
           console.log('请求超时');
         })
     },
-    selectCompany(name, industry, phase, citystr) { //查询平台云项目列表数据
+    handleSizeChange(pageSize) {
+      console.log(pageSize);
+      this.selectCompany('',1,pageSize);
+    },
+    handleCurrentChangeBtn(pageNum) { //分页按钮
+      // alert(555);
+      console.log(pageNum);
+      this.selectCompany('',pageNum, 10);
+    },
+    selectCompany(name, page, pageSize) { //查询平台云项目列表数据
       this.$http.post(this.api + '/CompanyClieController/selectCompany', {
-        "name": name,
-        "industry": industry,
-        "phase": phase,
-        "citystr": citystr
+        name: name,
+        page: page,
+        pageSize: pageSize
       })
         .then(res => {
           if (res.status == '200') {
@@ -622,6 +638,10 @@ export default {
                 item.startDate = getDate(item.startDate);
               }, this);
               this.leadTabData = res.data.result.list;
+              this.page.pageNum = res.data.result.pageNum; //当前页码
+              this.page.total = res.data.result.total; //数据总数
+              this.page.pageSize = res.data.result.pageSize; //每页条数
+              this.page.navigatepageNums = res.data.result.navigatepageNums.length; //页数长度
               this.$Message.success(res.data.message);
             } else if (res.data.status == '403') {
               this.$Message.error(res.data.message);
@@ -637,10 +657,10 @@ export default {
       this.$http.post(this.api + '/productClieController/insertMessage', {
         company: this.company,
         productInfo: this.productInfo,
-        productservice: this.productservice,
-        basicInfo: this.basicInfo,
         finance: this.finance,
         teamintro: this.teamintro,
+        basicInfo: this.basicInfo,
+        productservice: this.productservice,
       })
         .then(res => {
           if (res.status == '200') {
