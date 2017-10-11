@@ -76,7 +76,7 @@
                   </el-col>
                   <el-col :span='9'>
                     <div class="checkbox">
-                      <el-checkbox @change="handleSelectionChange1()" v-model="item.selected"></el-checkbox>
+                      <el-checkbox :disabled="isAdmin" @change="handleSelectionChange1()" v-model="item.selected"></el-checkbox>
                     </div>
                   </el-col>
                 </el-row>
@@ -86,7 +86,7 @@
                   </el-col>
                   <el-col :span='9'>
                     <div class="checkbox">
-                      <el-checkbox @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
+                      <el-checkbox :disabled="isAdmin" @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
                     </div>
                   </el-col>
                 </el-row>
@@ -131,6 +131,7 @@ export default {
   },
   data() {
     return {
+      isAdmin: false,
       menuIds: '', //保存角色权限
       rowName: "请选择角色进行操作",
       ResourceArr: [], //保存角色权限的数组
@@ -197,8 +198,7 @@ export default {
           }
         })
         .catch(error => {
-          // this.$Message.error('请求超时');
-          console.log('请求超时');
+          this.$Message.error('请求超时');
         })
     },
     findResourceByMid() { //查询企业权限列表
@@ -339,12 +339,15 @@ export default {
     },
     findByRid(row) { //查询角色
       if (row.isAdmin) {
-        this.$Message.warning('超级管理员不能进行操作');
-        return;
+        alert(222);
+        this.roleId = row.id;
+        this.isAdmin = true;
+      } else {
+        this.isAdmin = false;
+        this.rowName = row.roleName;
+        this.roleId = row.id; //保存角色id
+        this.findResourceByRid(this.roleId);
       };
-      this.rowName = row.roleName;
-      this.roleId = row.id; //保存角色id
-      this.findResourceByRid(this.roleId);
     },
     authorizationBtn() {
       if (this.roleId == '' || this.menus == '') {
@@ -354,6 +357,10 @@ export default {
       this.authorization();
     },
     authorization() { //角色授权 api
+    if(this.isAdmin){
+      this.$Message.warning('超级管理员不能进行操作');
+      return;
+    };
       var arr = [];
       this.menus.map(item => {
         if (item.selected) {

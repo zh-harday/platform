@@ -255,6 +255,9 @@ export default {
     }
   },
   methods: {
+    handleIconClick(){
+      this.queryRoleListByUM('',this.input2);
+    },
     selectValue(value) {
       console.log(value);
       this.queryRoleListByUM(value);
@@ -438,6 +441,7 @@ export default {
               this.userListFormData.six = res.data.result.six;
               this.userListFormData.phone = res.data.result.phone;
               this.userListFormData.emil = res.data.result.emil;
+              this.userListFormData.roleName = res.data.result.roleName;
               this.$Message.success(res.data.message);
             }
           } else if (res.status == '403') {
@@ -448,10 +452,10 @@ export default {
           this.$Message.error("请求超时");
         })
     },
-    queryRoleListByUM(num) { //查询平台所有用户列表 api
+    queryRoleListByUM(num,name) { //查询平台所有用户列表 api
       this.$http.post(this.api + '/user/queryUserByMid', {
         "merchantId": this.userId.merchants[0].id,
-        // "userName": this.userId.userInfor.name,
+        "userName": name,
         "lockValue": num,
       })
         .then(res => {

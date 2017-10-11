@@ -55,8 +55,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="成立时间" prop="startdate" :label-width="formLabelWidth">
-                <el-date-picker format="yyyy-MM-dd" @change="getDate1" v-model="company.startdate" align="right" type="date" placeholder="选择日期">
+              <el-form-item label="成立时间" prop="startDateStr" :label-width="formLabelWidth">
+                <el-date-picker format="yyyy-MM-dd" @change="getDate1" v-model="company.startDateStr" align="right" type="date" placeholder="选择日期">
                 </el-date-picker>
               </el-form-item>
             </el-col>
@@ -133,7 +133,7 @@
           </el-col>
           <el-col :span="24">
             <el-table align="center" :data="finance" ref="finance" border style="width: 100%">
-              <el-table-column prop="date" label="时间" align="center">
+              <el-table-column prop="financedateStr" label="时间" align="center">
               </el-table-column>
               <el-table-column prop="phase" label="轮次" align="center">
               </el-table-column>
@@ -199,8 +199,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="成立日期" porp="startdate" :label-width="formLabelWidth">
-                <el-date-picker @change="getDate2" v-model="basicInfo.startdate" align="right" type="date" placeholder="选择日期">
+              <el-form-item label="成立日期" porp="startDateStr" :label-width="formLabelWidth">
+                <el-date-picker @change="getDate2" v-model="basicInfo.startDateStr" align="right" type="date" placeholder="选择日期">
                 </el-date-picker>
               </el-form-item>
             </el-col>
@@ -243,8 +243,8 @@
         <el-form :model="financeF" ref="financeF" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="时间" porp="financedate" :label-width="formLabelWidth">
-                <el-date-picker @change="getDate3" v-model="financeF.financedate" align="right" type="date" placeholder="选择日期" :picker-options="pickerOptions1">
+              <el-form-item label="时间" porp="financedateStr" :label-width="formLabelWidth">
+                <el-date-picker @change="getDate3" v-model="financeF.financedateStr" align="right" type="date" placeholder="选择日期" :picker-options="pickerOptions1">
                 </el-date-picker>
               </el-form-item>
             </el-col>
@@ -363,7 +363,8 @@ export default {
         phase: '', //轮次
         lastCast: '', //上轮获投
         city: '', //所在地
-        startdate: '', //成立时间
+        // startdate: '', //成立时间
+        startDateStr: '', //成立时间
       },
       companys: { //基本信息
         name: '', //项目名称
@@ -371,7 +372,8 @@ export default {
         phase: '', //轮次
         lastCast: '', //上轮获投
         city: '', //所在地
-        startdate: '', //成立时间
+        // startdate: '', //成立时间
+        startDateStr: '', //成立时间
       },
       productInfo: { //项目介绍
         brief: "", //概述
@@ -384,7 +386,8 @@ export default {
       },
       finance: [], //融资经历 Tab
       financeF: { //融资经历 Form
-        financedate: "", //时间
+        // financedate: "", //时间
+        financedateStr: "", //时间
         phase: "", //轮次
         financeamount: "", //融资金额
         investment: "", //投资方
@@ -400,7 +403,8 @@ export default {
         name: "", //公司名称
         conpanyType: "", //公司类型
         registcapi: "", //注册资本
-        startdate: "", //成立日期
+        // startdate: "", //成立日期
+        startDateStr: "", //成立日期
         opername: "", //法人代表
         managementForms: "", //经营状态
         registrationAuthority: "", //登记机关
@@ -410,7 +414,8 @@ export default {
         name: "", //公司名称
         conpanyType: "", //公司类型
         registcapi: "", //注册资本
-        startdate: "", //成立日期
+        // startdate: "", //成立日期
+        startDateStr: "", //成立日期
         opername: "", //法人代表
         managementForms: "", //经营状态
         registrationAuthority: "", //登记机关
@@ -468,30 +473,14 @@ export default {
       console.log('this file');
       console.log(this.file);
     },
-    getDateStr(value) { //时间转换时间戳
-      var stringTime = value;
-      var timestamp2 = Date.parse(new Date(stringTime));
-      timestamp2 = timestamp2 / 1000;
-      // console.log(timestamp2);
-      return timestamp2;
-    },
     getDate1(value) {
-      // console.log(value);
-      this.company.startdate = value;
-      // this.companys.startdate = this.getDateStr(value);
-      // console.log(this.companys.startdate);
-      // console.log(this.company.startdate);
+      this.company.startDateStr = value;
     },
     getDate2(value) {
-      // console.log(value);
-      this.basicInfo.startdate = value;
-      // this.basicInfos.startdate = this.getDateStr(value);
-      // console.log(this.basicInfos.startdate);
+      this.basicInfo.startDateStr = value;
     },
     getDate3(value) {
-      // console.log(value);
-      this.financeF.date = getDateStr(value);
-      // console.log(this.financeF.date);
+      this.financeF.financedateStr = value;
     },
     addLeaderAssistantForm(n) { //添加平台云项目 Addbtn
       // alert(n);
@@ -505,7 +494,7 @@ export default {
           phase: '', //轮次
           lastCast: '', //上轮获投
           city: '', //所在地
-          startdate: '', //成立时间
+          startDateStr: '', //成立时间
         };
         let new_productInfo = {
           brief: "", //概述
@@ -520,7 +509,7 @@ export default {
           name: "", //公司名称
           conpanyType: "", //公司类型
           registcapi: "", //注册资本
-          startdate: "", //成立日期
+          startDateStr: "", //成立日期
           opername: "", //法人代表
           managementForms: "", //经营状态
           registrationAuthority: "", //登记机关
@@ -535,7 +524,7 @@ export default {
       } else if (n == 2) {
         // alert(2);
         let new_financeF = {
-          financedate: "", //时间
+          financedateStr: "", //时间
           phase: "", //轮次
           financeamount: "", //融资金额
           investment: "", //投资方
@@ -563,7 +552,6 @@ export default {
         console.log(this.finance);
         console.log(this.teamintro);
         console.log(this.basicInfo);
-        // console.log(this.productservice);
         console.log(this.story);
         this.insertMessage();
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
@@ -728,7 +716,7 @@ export default {
             console.log(res);
             if (res.data.status == '200') {
               console.log(res.data);
-              this.selectCompany('', '', '', '');
+              this.selectCompany('', 1,10);
               this.$Message.success(res.data.message);
             } else if (res.data.status == '403') {
               this.$Message.error(res.data.message);
