@@ -37,7 +37,7 @@
                 </el-col>
                 <el-col :span="4">
                     <div>
-                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn({id: 0})">
+                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(0)">
                             <Icon size="20" type="plus-round"></Icon>
                         </el-button>
                     </div>
@@ -66,7 +66,7 @@
                             <div>
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(item)">
                                     <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(item,parent)">
+                                <el-button style="color:#5c6b77" type="text" @click="editMenu(item,parent,'parent')">
                                     <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                 <el-button style="color:#5c6b77" type="text" @click="deletMenuA(item)">
                                     <Icon size="20" type="trash-a"></Icon>
@@ -90,10 +90,10 @@
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(scope.row)">
                                     <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
                                 </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row,children)">
+                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row,children,'children')">
                                     <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
                                 </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.$index, item.children)">
+                                <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.row)">
                                     <Icon size="20" type="trash-a"></Icon>
                                 </el-button>
                             </template>
@@ -152,7 +152,7 @@ export default {
             checked: true,
             menus: [],
             rowMenuID: {}, //添加菜单pid
-            parentId: 0,
+            parentId: '0',
             featuresTabData: [
                 {
                     name: "日常办公",
@@ -211,16 +211,21 @@ export default {
                 remarks: "",
                 editFlag: false
             };
+            if (row == 0) {
+                this.parentId = '0';
+            };
             this.addFormData = new_addFormData;
             this.dialogFormVisible1 = true;
         },
-        editMenu(row,parent) { //编辑
+        editMenu(row, parent, type) { //编辑
             console.log(row)
-            if(parent == 'parent'){
-                this.parentId = 0;
-                alert(666);
-            } else {
-                this.parentId = false;
+            // alert(888);
+            if (type == 'parent') {
+                this.parentId = '0';
+                // alert(666);
+            } else if (type == 'children') {
+                this.parentId = row.parentId;
+                // this.parentId = false;
             };
             this.rowMenuID = row;
             this.dialogFormVisible1 = true;
@@ -230,9 +235,16 @@ export default {
             this.addMenusFormData.description = row.description;
             row.editFlag = !row.editFlag;
         },
-        deletMenu(index, row) { //删除子菜单
-            this.deleteById(row);
-            row.splice(index, 1);
+        deletMenu(item) { //删除子菜单
+            console.log('子菜单');
+            console.log(item);
+            this.deleteById(item);
+            // item.splice(index, 1);
+            item.menuName = '';
+            item.url = '';
+            item.createDate = '';
+            item.versionRecord = '';
+            item.description = '';
         },
         deletMenuA(item) { //删除一级菜单
             console.log(item);
@@ -256,11 +268,11 @@ export default {
                 "menuName": this.addMenusFormData.menuName,
                 "url": this.addMenusFormData.url,
                 "description": this.addMenusFormData.description,
-                "icon": this.rowMenuID.icon,
-                "sort": 1,
-                "parentId": this.rowMenuID.id,
-                "type": this.rowMenuID.type,
-                "code": 'sys_menu',
+                "parentId": this.parentId,
+                // "icon": this.rowMenuID.icon,
+                // "sort": 1,
+                // "type": this.rowMenuID.type,
+                // "code": 'sys_menu',
             })
                 .then(res => {
                     if (res.status == '200') {
@@ -279,16 +291,17 @@ export default {
             this.dialogFormVisible1 = false;
         },
         updateMenu() { //修改菜单信息
+            console.log(this.rowMenuID.id);
             this.$http.post(this.api + '/sysMenu/update', {
                 id: this.rowMenuID.id,
-                "menuName": this.addMenusFormData.menuName,
-                "url": this.addMenusFormData.url,
-                "description": this.addMenusFormData.description,
-                "icon": this.rowMenuID.icon,
-                "sort": 1,
-                "parentId": this.parentId,
-                "type": this.rowMenuID.type,
-                "code": 'sys_menu',
+                menuName: this.addMenusFormData.menuName,
+                url: this.addMenusFormData.url,
+                description: this.addMenusFormData.description,
+                parentId: this.parentId,
+                // icon: '',
+                // sort: 1,
+                // type: '',
+                // code: '',
             })
                 .then(res => {
                     if (res.status == '200') {

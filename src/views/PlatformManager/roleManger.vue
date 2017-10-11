@@ -65,6 +65,9 @@
             <!-- 权限列表 Start -->
             <!-- 权限列表 End -->
             <!-- sys menu -->
+            <el-row v-if="menus_list" style="text-align: center;margin-top: 20px;">
+              <el-col>暂无数据</el-col>
+            </el-row>
             <el-row>
               <el-col :span="24" v-for="(item,index) in menus" :key="item">
                 <el-row class="common sys_menu_head_2">
@@ -199,13 +202,19 @@ export default {
         })
     },
     findResourceByMid() { //查询企业权限列表
-      this.$http.post(this.api + '/sysMenu/queryList', {})
+      this.$http.post(this.api + '/user/findResourceByMid', {
+        merchantId: this.merchants[0].id
+      })
         .then(res => {
           if (res.status == '200') {
             // alert(555);
-            console.log(res.data);
-            this.queryRoleListByUM()
+            this.queryRoleListByUM();
             this.menus = getNodes(res.data.result);
+            // this.menus = res.data.result;
+            if(this.menus == ''){
+              this.menus_list = true;
+              this.$Message.warning('无菜单列表数据');
+            };
             this.menus.forEach(function(ele, index) {
               ele.selected = false;
               if (ele.children) {
@@ -214,8 +223,8 @@ export default {
                 });
               }
             });
-
           }
+          console.log(res.data.result);
         })
         .catch(error => {
           this.$Message.error('请求超时');
@@ -310,6 +319,7 @@ export default {
       })
         .then(res => {
           if (res.status == '200') {
+            console.log(res.data);
             this.menus.forEach(function(ele, index) {
               ele.selected = false;
               if (ele.children) {
@@ -328,10 +338,10 @@ export default {
         })
     },
     findByRid(row) { //查询角色
-    if(row.isAdmin){
-      this.$Message.warning('超级管理员不能进行操作');
-      return;
-    };
+      if (row.isAdmin) {
+        this.$Message.warning('超级管理员不能进行操作');
+        return;
+      };
       this.rowName = row.roleName;
       this.roleId = row.id; //保存角色id
       this.findResourceByRid(this.roleId);
@@ -348,7 +358,7 @@ export default {
       this.menus.map(item => {
         if (item.selected) {
           arr.push(item.id)
-        }
+        };
         if (item.children) {
           item.children.map(list => {
             if (list.selected) {
@@ -356,7 +366,7 @@ export default {
             }
           })
         }
-      })
+      });
       var menuIds = arr.join(",")
 
       this.$http.post(this.api + '/role/authorization', {
@@ -372,12 +382,11 @@ export default {
           }
         })
         .catch(error => {
-          // this.$Message.error("请求超时");
-          console.log('请求超时');
+          this.$Message.error("请求超时");
         })
     },
     pushRolTabData_L() { //确定
-      if(this.editRole){
+      if (this.editRole) {
         this.updateRole();
         this.rolFormDialog = false;
         return;
@@ -399,7 +408,7 @@ export default {
     },
     editSelecttionTab(index, row) { //编辑
       // alert(1002);
-      this.editRole =true;
+      this.editRole = true;
       this.rolFormDialog = true;
       this.rolFormData_L.roleName = row.roleName;
       this.roleId = row.id;

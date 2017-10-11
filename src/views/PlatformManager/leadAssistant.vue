@@ -56,7 +56,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="成立时间" prop="startdate" :label-width="formLabelWidth">
-                <el-date-picker @change="getDate1" v-model="company.startdate" align="right" type="date" placeholder="选择日期">
+                <el-date-picker format="yyyy-MM-dd" @change="getDate1" v-model="company.startdate" align="right" type="date" placeholder="选择日期">
                 </el-date-picker>
               </el-form-item>
             </el-col>
@@ -243,8 +243,8 @@
         <el-form :model="financeF" ref="financeF" :label-position="leaderAssistantFormDialog_align">
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="时间" porp="date" :label-width="formLabelWidth">
-                <el-date-picker @change="getDate3" v-model="financeF.date" align="right" type="date" placeholder="选择日期" :picker-options="pickerOptions1">
+              <el-form-item label="时间" porp="financedate" :label-width="formLabelWidth">
+                <el-date-picker @change="getDate3" v-model="financeF.financedate" align="right" type="date" placeholder="选择日期" :picker-options="pickerOptions1">
                 </el-date-picker>
               </el-form-item>
             </el-col>
@@ -331,6 +331,7 @@
 
 <script>
 import { getDate } from 'common/js/config'
+import { getDateStr } from 'common/js/config'
 export default {
   computed: {
     user() {
@@ -347,6 +348,9 @@ export default {
   },
   data() {
     return {
+      date1: '',
+      date2: '',
+      date3: '',
       story: '', //团队优势
       industry: [], //行业数据
       city: [], //所在地数据
@@ -354,6 +358,14 @@ export default {
       file: '', //上传文件url
       leadTabData: [], //Tab
       company: { //基本信息
+        name: '', //项目名称
+        industry: '', //行业
+        phase: '', //轮次
+        lastCast: '', //上轮获投
+        city: '', //所在地
+        startdate: '', //成立时间
+      },
+      companys: { //基本信息
         name: '', //项目名称
         industry: '', //行业
         phase: '', //轮次
@@ -372,7 +384,7 @@ export default {
       },
       finance: [], //融资经历 Tab
       financeF: { //融资经历 Form
-        date: "", //时间
+        financedate: "", //时间
         phase: "", //轮次
         financeamount: "", //融资金额
         investment: "", //投资方
@@ -383,9 +395,18 @@ export default {
         name: "", //姓名
         position: "", //职位
         intro: "", //介绍
-        story: '' //团队优势
       },
       basicInfo: { //工商信息 Form
+        name: "", //公司名称
+        conpanyType: "", //公司类型
+        registcapi: "", //注册资本
+        startdate: "", //成立日期
+        opername: "", //法人代表
+        managementForms: "", //经营状态
+        registrationAuthority: "", //登记机关
+        registAddress: "", //注册地址
+      },
+      basicInfos: { //工商信息 Form
         name: "", //公司名称
         conpanyType: "", //公司类型
         registcapi: "", //注册资本
@@ -447,18 +468,30 @@ export default {
       console.log('this file');
       console.log(this.file);
     },
+    getDateStr(value) { //时间转换时间戳
+      var stringTime = value;
+      var timestamp2 = Date.parse(new Date(stringTime));
+      timestamp2 = timestamp2 / 1000;
+      // console.log(timestamp2);
+      return timestamp2;
+    },
     getDate1(value) {
       // console.log(value);
       this.company.startdate = value;
+      // this.companys.startdate = this.getDateStr(value);
+      // console.log(this.companys.startdate);
+      // console.log(this.company.startdate);
     },
     getDate2(value) {
-      // alert(333);
-      console.log(value);
+      // console.log(value);
       this.basicInfo.startdate = value;
+      // this.basicInfos.startdate = this.getDateStr(value);
+      // console.log(this.basicInfos.startdate);
     },
     getDate3(value) {
-      console.log(value);
-      this.financeF.date = value;
+      // console.log(value);
+      this.financeF.date = getDateStr(value);
+      // console.log(this.financeF.date);
     },
     addLeaderAssistantForm(n) { //添加平台云项目 Addbtn
       // alert(n);
@@ -466,10 +499,43 @@ export default {
         this.select2Menu();
         // alert(11);
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
+        let new_company = {
+          name: '', //项目名称
+          industry: '', //行业
+          phase: '', //轮次
+          lastCast: '', //上轮获投
+          city: '', //所在地
+          startdate: '', //成立时间
+        };
+        let new_productInfo = {
+          brief: "", //概述
+          intro: "", //详细介绍
+          productservice: "", //产品服务
+          usermarket: "", //用户市场
+          businessModel: "", //商业模式
+          OperationData: "", //运营数据
+          businessPlan: "", //商业计划书url
+        };
+        let new_basicInfo = {
+          name: "", //公司名称
+          conpanyType: "", //公司类型
+          registcapi: "", //注册资本
+          startdate: "", //成立日期
+          opername: "", //法人代表
+          managementForms: "", //经营状态
+          registrationAuthority: "", //登记机关
+          registAddress: "", //注册地址
+        };
+        this.company = new_company;
+        this.productInfo = new_productInfo;
+        this.basicInfo = new_basicInfo;
+        this.finance = [];
+        this.teamintro = [];
+        this.story = '';
       } else if (n == 2) {
         // alert(2);
         let new_financeF = {
-          date: "", //时间
+          financedate: "", //时间
           phase: "", //轮次
           financeamount: "", //融资金额
           investment: "", //投资方
@@ -483,7 +549,6 @@ export default {
           name: "", //姓名
           position: "", //职位
           intro: "", //介绍
-          story: '' //团队优势
         };
         this.teamintroF = new_teamintroF;
         this.AddTeamDialogFormVisible = !this.AddTeamDialogFormVisible;
@@ -498,14 +563,10 @@ export default {
         console.log(this.finance);
         console.log(this.teamintro);
         console.log(this.basicInfo);
-        console.log(this.productservice);
+        // console.log(this.productservice);
+        console.log(this.story);
         this.insertMessage();
         this.leaderAssistantFormDialog = !this.leaderAssistantFormDialog;
-        this.company = {};
-        this.productInfo = {};
-        this.finance = [];
-        this.teamintro = [];
-        this.basicInfo = {};
       } else if (n == 2) {
         // alert(2);
         this.finance.push(this.financeF);
@@ -513,7 +574,7 @@ export default {
         this.financeF = {};
       } else if (n == 3) {
         // alert(3);
-        this.teamintroF.story = this.story;
+        // this.teamintroF.story = this.story;
         this.teamintro.push(this.teamintroF);
         this.AddTeamDialogFormVisible = !this.AddTeamDialogFormVisible;
         this.teamintroF = {};
@@ -521,8 +582,8 @@ export default {
     },
     storyBlur() { //获取团队优势数据
       // alert(666);
-      this.teamintroF.story = this.story;
-      console.log(this.teamintroF.story);
+      // this.teamintroF.story = this.story;
+      // console.log(this.teamintroF.story);
     },
     hideRowBtn(index, row) { //隐藏按钮
       this.concealCompany(row.id);
@@ -612,12 +673,12 @@ export default {
     },
     handleSizeChange(pageSize) {
       console.log(pageSize);
-      this.selectCompany('',1,pageSize);
+      this.selectCompany('', 1, pageSize);
     },
     handleCurrentChangeBtn(pageNum) { //分页按钮
       // alert(555);
       console.log(pageNum);
-      this.selectCompany('',pageNum, 10);
+      this.selectCompany('', pageNum, 10);
     },
     selectCompany(name, page, pageSize) { //查询平台云项目列表数据
       this.$http.post(this.api + '/CompanyClieController/selectCompany', {
@@ -660,7 +721,7 @@ export default {
         finance: this.finance,
         teamintro: this.teamintro,
         basicInfo: this.basicInfo,
-        productservice: this.productservice,
+        story: this.story
       })
         .then(res => {
           if (res.status == '200') {

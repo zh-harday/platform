@@ -338,9 +338,10 @@ export default {
         })
     },
     findResourceByMid() { //查询平台客户权限列表
-      this.$http.post(this.api + '/user/findResourceByMid', {
-        merchantId: this.user.merchants[0].id
-      })
+      // this.$http.post(this.api + '/user/findResourceByMid', {
+      //   merchantId: this.user.merchants[0].id
+      // })
+      this.$http.post(this.api + '/sysMenu/queryList', {})
         .then(res => {
           if (res.status == '200') {
             this.menus = getNodes(res.data.result);

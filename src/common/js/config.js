@@ -15,7 +15,15 @@ export function getDate(value) { //时间戳转换标准时间
     return tt;
 }
 
-export function getSysDate() {//封装获取当前系统时间的方法
+export function getDateStr(value) { //时间转换时间戳
+    var stringTime = value;
+    var timestamp2 = Date.parse(new Date(stringTime));
+    timestamp2 = timestamp2 / 1000;
+    // console.log(timestamp2);
+    return timestamp2;
+}
+
+export function getSysDate() { //封装获取当前系统时间的方法
     var date = new Date();
     var seperator1 = "-";
     var seperator2 = ":";
@@ -27,9 +35,9 @@ export function getSysDate() {//封装获取当前系统时间的方法
     if (strDate >= 0 && strDate <= 9) {
         strDate = "0" + strDate;
     }
-    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
-        + " " + date.getHours() + seperator2 + date.getMinutes()
-        + seperator2 + date.getSeconds();
+    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate +
+        " " + date.getHours() + seperator2 + date.getMinutes() +
+        seperator2 + date.getSeconds();
     return currentdate;
 }
 
@@ -73,6 +81,6 @@ function pushNode(node, pNodes) {
                 // alert(222)
                 pNode.children.push(node);
             }
-        } 
+        }
     })
 }
