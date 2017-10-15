@@ -60,20 +60,13 @@
             <el-col :span="24">
               <div class="grid-content bg-purple-dark">
                 <el-form-item prop="roleName" label="角色" :label-width="formLabelWidth">
-                  <el-select @change="getRoleName" multiple v-model="userListFormData.roleName" placeholder="请选择" size="120%">
+                  <el-select value-key="id" @change="getRoleName" multiple v-model="userListFormData.roleName" placeholder="请选择" size="120%">
                     <el-option v-for="item in roleList" :key="item.value" :label="item.roleName" :value="item.id">
                     </el-option>
                   </el-select>
                 </el-form-item>
               </div>
             </el-col>
-            <!-- <el-col :span="12">
-                              <div class="grid-content bg-purple-dark">
-                                <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
-                                  <el-input v-model="userListFormData.pass" auto-complete="off"></el-input>
-                                </el-form-item>
-                              </div>
-                            </el-col> -->
           </el-row>
           <div class="inforBackg">个人信息</div>
           <el-row :gutter="20">
@@ -255,8 +248,8 @@ export default {
     }
   },
   methods: {
-    handleIconClick(){
-      this.queryRoleListByUM('',this.input2);
+    handleIconClick() {
+      this.queryRoleListByUM('', this.input2);
     },
     selectValue(value) {
       console.log(value);
@@ -286,14 +279,16 @@ export default {
         id: '', //用户 id
         umId: '', //用户商户中间表id
         pass: '123456', //用户密码
-        roleName: '' //角色名称
+        roleName: [] //角色名称
       };
+      this.roleList = [];
       this.userListFormData = new_userListFormData;
-      this.queryUserListByUM(1); //查询企业角色列表
+      this.queryUserListByUM(1, ''); //查询企业角色列表
       this.userListDialogFormVisible = true;
     },
     editSaveUserListBtn() { //确定
       if (this.add) {
+        this.userListFormData.roleName = this.userListFormData.roleName.join(',');
         console.log(this.userListFormData);
         this.saveUser();
       } else {
@@ -317,7 +312,7 @@ export default {
     },
     getRoleName(value) {
       // console.log(value);
-      this.userListFormData.roleName = value;
+      // this.userListFormData.roleName = value;
     },
     getDateValue(value) {
       this.userListFormData.birthday = value;
@@ -328,7 +323,6 @@ export default {
       this.userListDialogFormVisible = true;
       this.queryUser(row.userId); //用户详情
       this.queryUserListByUM(row.userId, row.umId); //查询企业角色列表
-
     },
     // saveUserListTabData(index, row) { //保存
     //   row.editFlag = false;
@@ -375,13 +369,13 @@ export default {
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
+              this.roleList = res.data.result;
               if (umid) {
                 // alert('umid');
                 this.queryUserRoleList(umid); //查询用户拥有角色列表
               };
               console.log('企业角色列表');
               console.log(res.data);
-              this.roleList = res.data.result;
               this.$Message.success(res.data.message);
             }
           } else if (res.data.status == '403') {
@@ -415,44 +409,7 @@ export default {
           this.$Message.error('请求超时');
         })
     },
-    queryUser(id) { //查询用户详情列表数据 api
-      this.$http.post(this.api + '/user/queryUser', {
-        "userId": id
-      })
-        .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
-              console.log('用户详情');
-              console.log(res.data);
-              for (let item in res.data.result) {
-                if (res.data.result.six == '0') {
-                  res.data.result.six = '女';
-                } else {
-                  res.data.result.six = '男';
-                }
-                // this.userListFormData.pass = this.md5(res.data.result.pass, 32);
-              };
-              this.userListFormData.id = res.data.result.id;
-              this.userListFormData.umId = res.data.result.umId;
-              this.userListFormData.name = res.data.result.name;
-              this.userListFormData.number = res.data.result.number;
-              this.userListFormData.pass = res.data.result.pass;
-              this.userListFormData.birthday = res.data.result.birthday;
-              this.userListFormData.six = res.data.result.six;
-              this.userListFormData.phone = res.data.result.phone;
-              this.userListFormData.emil = res.data.result.emil;
-              this.userListFormData.roleName = res.data.result.roleName;
-              this.$Message.success(res.data.message);
-            }
-          } else if (res.status == '403') {
-            this.$Message.error(res.data.message);
-          }
-        })
-        .catch(error => {
-          this.$Message.error("请求超时");
-        })
-    },
-    queryRoleListByUM(num,name) { //查询平台所有用户列表 api
+    queryRoleListByUM(num, name) { //查询平台所有用户列表 api
       this.$http.post(this.api + '/user/queryUserByMid', {
         "merchantId": this.userId.merchants[0].id,
         "userName": name,
@@ -473,14 +430,24 @@ export default {
     },
     queryUser(id) { //查询用户详情列表数据 api
       this.$http.post(this.api + '/user/queryUser', {
-        // this.$http.post(this.api + '/user/queryUserInfo', {
-        "userId": id
+        "userId": id,
+        "merchantId": this.userId.merchants[0].id
       })
         .then(res => {
           if (res.status == '200') {
             if (res.data.status == '200') {
               console.log('用户详情');
               console.log(res.data);
+              this.userListFormData.roleName = [];
+              res.data.result.roleList.forEach(item => {
+                if (item.roleName) {
+                  // alert(555);
+                  // console.log(item.roleName);
+                  this.userListFormData.roleName.push(item.roleName);
+                  console.log(this.userListFormData.roleName);
+                }
+              });
+
               for (let item in res.data.result) {
                 if (res.data.result.six == '0') {
                   res.data.result.six = '女';
@@ -489,6 +456,7 @@ export default {
                 }
                 // this.userListFormData.pass = this.md5(res.data.result.pass, 32);
               };
+              // this.roleList = res.data.result.roleList;
               this.userListFormData.id = res.data.result.id;
               this.userListFormData.umId = res.data.result.umId;
               this.userListFormData.name = res.data.result.name;
@@ -539,7 +507,6 @@ export default {
         })
     },
     saveUser() { //保存新增用户信息
-      // alert(666);
       this.$http.post(this.api + '/user/saveUser', {
         "mId": this.userId.merchants[0].id,
         "name": this.userListFormData.name,
@@ -550,6 +517,7 @@ export default {
         "phone": this.userListFormData.phone,
         "emil": this.userListFormData.emil,
         "roleIds": this.userListFormData.roleName
+        // "roleIds": "1d1a3965cd4b499881bede7f4ea94a25,3655c5a1b2bf4f6cac7b31119e74dcac,5b491d3a1a4d4ea6ae6c853b13796d55"
       })
         .then(res => {
           if (res.status == '200') {

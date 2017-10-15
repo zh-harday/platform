@@ -201,6 +201,7 @@ export default {
         },
         addMenuBtn(row) { //添加
             this.rowMenuID = row; //保存当前行菜单信息
+            this.parentId = this.rowMenuID.id;
             this.isEdit = false;
             console.log(row);
             let new_addFormData = {

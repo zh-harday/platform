@@ -63,15 +63,15 @@
           </el-row>
           <el-row :gutter="20">
             <!-- <el-col :span="12">
-                      <div class="grid-content bg-purple-dark">
-                        <el-form-item prop="officeAddress" label="办公地址" :label-width="formLabelWidth">
-                          <el-select @change="typeSelect" v-model="addCustomerFormData.officeAddress" placeholder="请选择" size="100%">
-                            <el-option v-for="item in options" :key="item.id" :label="item.typeName" :value="item.id">
-                            </el-option>
-                          </el-select>
-                        </el-form-item>
-                      </div>
-                    </el-col> -->
+                          <div class="grid-content bg-purple-dark">
+                            <el-form-item prop="officeAddress" label="办公地址" :label-width="formLabelWidth">
+                              <el-select @change="typeSelect" v-model="addCustomerFormData.officeAddress" placeholder="请选择" size="100%">
+                                <el-option v-for="item in options" :key="item.id" :label="item.typeName" :value="item.id">
+                                </el-option>
+                              </el-select>
+                            </el-form-item>
+                          </div>
+                        </el-col> -->
             <el-col :span="12">
               <div class="grid-content bg-purple-dark">
                 <el-form-item prop="companyEmail" label="公司邮箱" :label-width="formLabelWidth">
@@ -188,7 +188,7 @@
       </el-dialog>
       <!-- 新增客户信息 Dialog End -->
       <el-table stripe :data="addCustomerTabData" :modul="addCustomerTabData" ref="addCustomerTabData" border style="width: 100%">
-        <el-table-column prop="merchantName" label="客户名称" align="center">
+        <el-table-column prop="merchantName" label="客户名称" align="center" width="250">
           <template scope="scope">
             <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.merchantName }}</span>
             <span v-if="scope.row.editFlag" class="cell-edit-input">
@@ -196,7 +196,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="startTime" label="开通日期" align="center">
+        <el-table-column prop="startTime" label="开通日期" align="center" width="250">
           <template scope="scope">
             <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.startTime }}</span>
             <span v-if="scope.row.editFlag" class="cell-edit-input">
@@ -204,7 +204,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="endTime" label="到期日期" align="center">
+        <el-table-column prop="endTime" label="到期日期" align="center" width="250">
           <template scope="scope">
             <span class="cursor" v-if="!scope.row.editFlag">{{ scope.row.endTime }}</span>
             <span v-if="scope.row.editFlag" class="cell-edit-input">
@@ -220,13 +220,18 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="disables" label="状态" align="center">
+        <el-table-column label="状态" align="center" width="200">
+          <template scope="scope">
+            <el-button type="text" size="small">{{scope.row.disables}}</el-button>
+            <el-button type="text" size="small">{{scope.row.type}}</el-button>
+          </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template scope="scope">
             <el-button :disabled="scope.row.disables =='锁定'" @click="EditBtn(scope.$index,scope.row)" type="primary" size="small">编 辑</el-button>
             <el-button :disabled="scope.row.disables =='锁定'" @click="locking(scope.$index,scope.row,0)" type="primary" size="small">锁 定</el-button>
             <el-button :disabled="scope.row.disables =='启用'" @click="locking(scope.$index,scope.row,1)" type="primary" size="small">启 用</el-button>
+            <el-button v-if="scope.row.type != '审核通过'" @click="examine(scope.row)" type="primary" size="small">审 核</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -302,7 +307,7 @@ export default {
   },
   methods: {
     handleIconClick() {
-      this.queryInfo(1,10,this.input2);
+      this.queryInfo(1, 10, this.input2);
     },
     submitForm(event) { //提交上传文件到服务器
       // alert(5656);
@@ -474,7 +479,7 @@ export default {
       console.log(pageNum);
       this.queryInfo(pageNum, 10);
     },
-    queryInfo(pageNum, pageSize,merchantName) { //查询客户列表数据 api
+    queryInfo(pageNum, pageSize, merchantName) { //查询客户列表数据 api
       this.$http.post(this.api + '/merchant/queryInfo', {
         merchantName: merchantName,
         page: pageNum, //当前页码
@@ -489,6 +494,16 @@ export default {
                   item.disables = '锁定';
                 } else if (item.disables == '1') {
                   item.disables = '启用';
+                };
+                if (item.type == '0') {
+                  // alert()
+                  item.type = '审核中';
+                } else if (item.type == '1') {
+                  item.type = '审核通过';
+                } else if (item.type == '2') {
+                  item.type = '审核失败';
+                } else if (item.type == '3') {
+                  item.type = '注册';
                 }
               }, this);
               this.addCustomerTabData = res.data.result.list;
@@ -515,7 +530,6 @@ export default {
               this.options = res.data.result;
               this.$Message.success(res.data.message);
             }
-
           } else if (res.status == '403') {
             this.$Message.error(res.data.message);
           }
@@ -576,6 +590,28 @@ export default {
           console.log('请求超时');
         })
     },
+    examine(row) { //审核客户 api
+      this.$http.post(this.api + '/merchant/examine', {
+        id: row.id,
+        type: 1
+      })
+        .then(res => {
+          if (res.status == '200') {
+            console.log(res);
+            if (res.data.status == '200') {
+              console.log(res.data);
+              this.queryInfo(1,10,'');
+              this.$Message.success(res.data.message);
+            } else if (res.data.status == '403') {
+              this.$Message.error(res.data.message);
+            }
+          }
+        })
+        .catch(error => {
+          this.$Message.error("请求超时");
+          console.log('请求超时');
+        })
+    }
   }
 }
 </script>

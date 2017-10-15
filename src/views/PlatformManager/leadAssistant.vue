@@ -451,7 +451,6 @@ export default {
         .then((res) => {
           if (res.status == '200') {
             if (res.data.status == '200') {
-              alert(2323);
               console.log(res.data);
               this.productInfo.businessPlan = res.data.filePath;
               console.log(this.productInfo.businessPlan);
