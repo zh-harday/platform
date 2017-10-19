@@ -5,7 +5,7 @@
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="请按客户名称进行查询" icon="search" v-model="input2" :on-icon-click="handleIconClick">
+            <el-input placeholder="请按客户名称进行查询" icon="search" v-model="input2" @keyup.enter.native="handleIconClick" :on-icon-click="handleIconClick">
             </el-input>
           </div>
         </el-col>

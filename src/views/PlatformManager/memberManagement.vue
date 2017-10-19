@@ -5,7 +5,7 @@
       <el-row class="customerMang">
         <el-col :span="6">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="" icon="search" v-model="input2" :on-icon-click="searchHandling">
+            <el-input placeholder="" icon="search" v-model="input2" @keyup.enter.native="searchHandling" :on-icon-click="searchHandling">
             </el-input>
           </div>
         </el-col>

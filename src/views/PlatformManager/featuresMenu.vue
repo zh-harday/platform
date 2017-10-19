@@ -182,7 +182,7 @@ export default {
             this.$http.post(this.api + '/sysMenu/queryList', {})
                 .then(res => {
                     if (res.status == '200') {
-                        console.log(res.data.result);
+                        // console.log(res.data.result);
                         res.data.result.forEach(function(item) {
                             item.createDate = getDate(item.createDate);
                             item.versionRecord = getDate(item.versionRecord);
@@ -200,10 +200,13 @@ export default {
                 })
         },
         addMenuBtn(row) { //添加
+        console.log(row);
+        if(row.id == null){
+            return;
+        };
             this.rowMenuID = row; //保存当前行菜单信息
             this.parentId = this.rowMenuID.id;
             this.isEdit = false;
-            console.log(row);
             let new_addFormData = {
                 name: "",
                 link: "",
@@ -272,7 +275,7 @@ export default {
                 "parentId": this.parentId,
                 // "icon": this.rowMenuID.icon,
                 // "sort": 1,
-                // "type": this.rowMenuID.type,
+                "type": 1,
                 // "code": 'sys_menu',
             })
                 .then(res => {

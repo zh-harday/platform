@@ -5,7 +5,7 @@
       <el-row class="searchBox">
         <el-col :span="4" class="searchIpt">
           <div class="grid-content bg-purple-dark">
-            <el-input placeholder="" icon="search" v-model="input2" :on-icon-click="handleIconClick">
+            <el-input placeholder="" icon="search" v-model="input2" @keyup.enter.native="handleIconClick" :on-icon-click="handleIconClick">
             </el-input>
           </div>
         </el-col>
