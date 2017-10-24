@@ -63,7 +63,7 @@
                         </el-col>
                         <el-col :span="4">
                             <div>
-                                <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(item,0)">
+                                <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(item,1)">
                                     <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                 <el-button style="color:#5c6b77" type="text" @click="editMenu(item,parent,'parent')">
                                     <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
@@ -98,7 +98,7 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-table stripe :show-header="false" :data="item.children.children" border style="width: 100%">
+                    <!-- <el-table stripe :show-header="false" :data="item.children.children" border style="width: 100%">
                         <el-table-column prop="menuName" label="" align="center">
                         </el-table-column>
                         <el-table-column prop="url" label="" align="center">
@@ -122,7 +122,7 @@
                                 </el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                    </el-table> -->
                 </el-col>
             </el-row>
             <!-- sys menu end -->
@@ -240,18 +240,9 @@ export default {
       console.log(row);
       this.rowMenuID = row; //保存当前行菜单信息
       if (num == 0) {
-        // this.radioBtn = false;
-      }
-      if (row.id == null) {
-        this.parentId = "0";
-        // this.radioBtn = false;
-      } else if (row.id != null && num == 1) {
-        // alert();
-        this.parentId = this.rowMenuID.id;
-        // this.radioBtn = true;
-      } else if (num == 2) {
-        this.parentId = this.rowMenuID.id;
-        // this.radioBtn = false;
+        this.parentId = '0';
+      } else {
+          this.parentId = this.rowMenuID.id;
       }
       this.isEdit = false;
       let new_addFormData = {

@@ -53,15 +53,17 @@ export function getNodes(arr) {
     var nodes = [];
     arr.map(function (node) {
         if (node.parentId === '0') {
-            nodes.push(node)
-        }
-    })
-
+            nodes.push(node);
+        };
+        // if (node.parentId !== '0') {
+        //     pushNode(node, nodes)
+        // }
+    });
     arr.map(function (node) {
         if (node.parentId !== '0') {
             pushNode(node, nodes)
         }
-    })
+    });
     // console.log(nodes);
     return nodes
 }
