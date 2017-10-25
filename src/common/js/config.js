@@ -49,15 +49,12 @@ export function clearValue(obj) {
 }
 
 export function getNodes(arr) {
-    console.log(arr);
+    // console.log(arr);
     var nodes = [];
     arr.map(function (node) {
         if (node.parentId === '0') {
             nodes.push(node);
         };
-        // if (node.parentId !== '0') {
-        //     pushNode(node, nodes)
-        // }
     });
     arr.map(function (node) {
         if (node.parentId !== '0') {
@@ -70,19 +67,46 @@ export function getNodes(arr) {
 
 function pushNode(node, pNodes) {
     //  alert(111);
-    let charlds = [];
     pNodes.map(function (pNode) {
-        // console.log(pNode.children);
         if (pNode.id == node.parentId) {
-            // console.log('*****:'+ pNode.children);
             if (!pNode.children) {
-                // console.log('//////'+pNode);
-                // alert(111)
                 pNode.children = [node];
             } else {
-                // alert(222)
                 pNode.children.push(node);
             }
+        } else if (pNode.children) {
+            pNode.children.map(function (item) {
+                if (item.id == node.parentId) {
+                    // if(item.menuName == '二级菜单'){
+                    //     console.log(node.menuName);
+                    // }
+                    if (!item.children) {
+                        item.children = [node];
+                    } else {
+                        item.children.push(node);
+                    }
+                }
+            })
+        } else {
+            pNode.children = [];
         }
     })
 }
+// function pushNode(node, pNodes) {
+//     //  alert(111);
+//     let charlds = [];
+//     pNodes.map(function (pNode) {
+//         // console.log(pNode.children);
+//         if (pNode.id == node.parentId) {
+//             // console.log('*****:'+ pNode.children);
+//             if (!pNode.children) {
+//                 // console.log('//////'+pNode);
+//                 // alert(111)
+//                 pNode.children = [node];
+//             } else {
+//                 // alert(222)
+//                 pNode.children.push(node);
+//             }
+//         }
+//     })
+// }

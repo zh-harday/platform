@@ -73,56 +73,67 @@
                             </div>
                         </el-col>
                     </el-row>
-                    <el-table stripe :show-header="false" :data="item.children" border style="width: 100%">
-                        <el-table-column prop="menuName" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="url" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="createDate" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="versionRecord" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="description" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="operating" label="" align="center">
-                            <template scope="scope">
-                                <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(scope.row,1)">
-                                    <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;
-                                </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row,children,'children')">
-                                    <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
-                                </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.row)">
-                                    <Icon size="20" type="trash-a"></Icon>
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <!-- <el-table stripe :show-header="false" :data="item.children.children" border style="width: 100%">
-                        <el-table-column prop="menuName" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="url" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="createDate" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="versionRecord" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="description" label="" align="center">
-                        </el-table-column>
-                        <el-table-column prop="operating" label="" align="center">
-                            <template scope="scope">
-                                <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(scope.row,1)">
-                                    <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;
-                                </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click="editMenu(scope.row,children,'children')">
-                                    <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
-                                </el-button>
-                                <el-button style="color:#5c6b77" type="text" @click.native.prevent="deletMenu(scope.row)">
-                                    <Icon size="20" type="trash-a"></Icon>
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table> -->
+
+                    <el-row class="common sys_menu_head_2">
+                        <el-col v-for="list in item.children" :key="list.id" :span="24">
+                            <el-row>
+                                <el-col :span="4">
+                                    <div>{{list.menuName}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{list.url}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{list.createDate}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{list.versionRecord}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{list.description}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,1)">
+                                            <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'parent')">
+                                            <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="deletMenuA(list)">
+                                            <Icon size="20" type="trash-a"></Icon>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                            <el-row v-for="ele in list.children" :key="ele.id" class="common sys_menu_head_2">
+                                <el-col :span="4">
+                                    <div>{{ele.menuName}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{ele.url}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{ele.createDate}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{ele.versionRecord}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>{{ele.description}}</div>
+                                </el-col>
+                                <el-col :span="4">
+                                    <div>
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,1)">
+                                            <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'parent')">
+                                            <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="deletMenuA(ele)">
+                                            <Icon size="20" type="trash-a"></Icon>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </el-col>
+                    </el-row>
                 </el-col>
             </el-row>
             <!-- sys menu end -->
@@ -130,10 +141,10 @@
                 <el-form :model="addMenusFormData" ref="addMenusFormData" label-position="left">
                     <el-row :gutter="20">
                         <el-col :span="12" style="text-align:center;margin-bottom:20px;">
-                            <el-radio class="radio" v-model="radio" label="1">菜单</el-radio>
+                            <el-radio class="radio" v-model="type" label=0>菜单</el-radio>
                         </el-col>
                         <el-col :span="12" style="text-align:center;margin-bottom:20px;">
-                            <el-radio class="radio" v-model="radio" label="2">按钮</el-radio>
+                            <el-radio class="radio" v-model="type" label=1>按钮</el-radio>
                         </el-col>
                         <el-col :span="12">
                             <div class="grid-content bg-purple-dark">
@@ -179,8 +190,8 @@ export default {
   },
   data() {
     return {
-      radio: "",
-      type: 1,
+      radio: 0,
+      type: 0,
       radioBtn: false,
       checked: true,
       menus: [],
@@ -218,12 +229,26 @@ export default {
         .post(this.api + "/sysMenu/queryList", {})
         .then(res => {
           if (res.status == "200") {
-            // console.log(res.data.result);
+            console.log(res.data.result);
             res.data.result.forEach(function(item) {
               item.createDate = getDate(item.createDate);
               item.versionRecord = getDate(item.versionRecord);
-            }, this);
-            this.menus = getNodes(res.data.result);
+              if (item.children) {
+                item.children.forEach(list => {
+                  list.createDate = getDate(list.createDate);
+                  list.versionRecord = getDate(list.versionRecord);
+                  if (list.children) {
+                    list.children.forEach(ele => {
+                      ele.createDate = getDate(ele.createDate);
+                      ele.versionRecord = getDate(ele.versionRecord);
+                    });
+                  }
+                });
+              }
+            });
+            // this.menus = getNodes(res.data.result);
+            this.menus = res.data.result;
+            // this.menus.forEach();
             console.log(this.menus);
             this.$Message.success(res.data.message);
           } else if (res.status == "403") {
@@ -240,10 +265,11 @@ export default {
       console.log(row);
       this.rowMenuID = row; //保存当前行菜单信息
       if (num == 0) {
-        this.parentId = '0';
+          alert()
+        this.parentId = "0";
       } else {
-          this.parentId = this.rowMenuID.id;
-      }
+        this.parentId = this.rowMenuID.id;
+      };
       this.isEdit = false;
       let new_addFormData = {
         name: "",
@@ -253,9 +279,6 @@ export default {
         remarks: "",
         editFlag: false
       };
-      if (row == 0) {
-        this.parentId = "0";
-      }
       this.addFormData = new_addFormData;
       this.dialogFormVisible1 = true;
     },
@@ -305,7 +328,8 @@ export default {
     saveSysMenu() {
       //send 添加菜单的信息
       console.log(this.addMenusFormData);
-      console.log(this.radio);
+      console.log(this.type);
+      this.type = Number(this.type);
       if (this.isEdit) {
         this.updateMenu();
         this.dialogFormVisible1 = false;
@@ -347,10 +371,10 @@ export default {
           menuName: this.addMenusFormData.menuName,
           url: this.addMenusFormData.url,
           description: this.addMenusFormData.description,
-          parentId: this.parentId
+          parentId: this.parentId,
+          type: this.type
           // icon: '',
           // sort: 1,
-          // type: '',
           // code: '',
         })
         .then(res => {
@@ -401,12 +425,12 @@ section {
   > div {
     background: #ffffff;
     padding: 24px;
-    overflow: hidden;
+    // overflow: hidden;
     .sys_menu_head {
       width: 100%;
       height: 50px;
       background: #2a3142;
-      overflow: hidden;
+      //   overflow: hidden;
       line-height: 50px;
       color: #ffffff;
       div {
@@ -416,19 +440,20 @@ section {
     }
     .sys_menu_head_2 {
       width: 100%;
-      height: 40px;
-      overflow: hidden;
+      //   height: 40px;
+      //   overflow: hidden;
       line-height: 40px;
       box-sizing: border-box;
-
+      border-bottom: 1px solid #dfe6ec;
       > div {
         // width: 230px;
-        height: 51px;
+        // height: 51px;
         float: left;
         text-align: center;
         box-sizing: border-box;
         border: 1px solid #dfe6ec;
         border-right: none;
+        border-bottom: none;
       }
       > div:last-child {
         border-right: 1px solid #dfe6ec;
@@ -437,7 +462,7 @@ section {
     .menus {
       width: 100%;
       height: 50px;
-      overflow: hidden;
+      //   overflow: hidden;
       line-height: 50px;
       text-align: center;
       > div {

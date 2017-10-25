@@ -98,14 +98,29 @@
                   </el-col>
                 </el-row>
 
-                <el-row class="common sys_menu_head_2" v-for="list in item.children" :key="list.id">
-                  <el-col :span="15">
-                    <div class="menuName">{{list.menuName}}</div>
-                  </el-col>
-                  <el-col :span='9'>
-                    <div class="checkbox">
-                      <el-checkbox @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
-                    </div>
+                <el-row class="common sys_menu_head_2">
+                  <el-col v-for="list in item.children" :key="list.id" :span="24">
+                      <el-row style="border-bottom: 1px solid #dfe6ec;">
+                        <el-col :span="15">
+                          <div class="menuName">{{list.menuName}}</div>
+                        </el-col>
+                        <el-col :span='9'>
+                          <div class="checkbox">
+                            <el-checkbox @change="handleSelectionChange2()" v-model="list.selected"></el-checkbox>
+                          </div>
+                        </el-col>
+                      </el-row>
+                      <el-row v-for="ele in list.children" :key="ele.id" class="common sys_menu_head_2">
+                        <!-- {{ele}} -->
+                        <el-col :span="15">
+                          <div class="menuName">{{ele.menuName}}</div>
+                        </el-col>
+                        <el-col :span='9'>
+                          <div class="checkbox">
+                            <el-checkbox @change="handleSelectionChange2()" v-model="ele.selected"></el-checkbox>
+                          </div>
+                        </el-col>
+                      </el-row>
                   </el-col>
                 </el-row>
               </el-col>
@@ -121,16 +136,18 @@
 </template>
 
 <script>
-import { getNodes } from 'common/js/config'
+import { getNodes } from "common/js/config";
 export default {
   computed: {
     user() {
-      this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
-      this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
+      this.$store.state.login.merchants =
+        JSON.parse(sessionStorage.getItem("merchants")) || {};
+      this.$store.state.login.userInfor =
+        JSON.parse(sessionStorage.getItem("userInfor")) || {};
       return {
         merchants: this.$store.state.login.merchants,
         userInfor: this.$store.state.login.userInfor
-      }
+      };
     }
   },
   created() {
@@ -146,30 +163,31 @@ export default {
       checkList: [],
       selected: 0,
       menus: [], //菜单列表数据
-      rowName: '请选择客户类型进行操作',
-      roleId: '',
+      rowName: "请选择客户类型进行操作",
+      roleId: "",
       customerTabData_L: [], //客户类型列表数据
-      customerFormData_L: { //添加客户类型表单
+      customerFormData_L: {
+        //添加客户类型表单
         typeName: "", //类型名称
-        typePostage: '', //资费
-        typeDescribe: '', //描述
-        count: 0, //限制人数
+        typePostage: "", //资费
+        typeDescribe: "", //描述
+        count: 0 //限制人数
       },
       customerFormData_options: [
         {
-          value: '免费',
-          label: '免费',
+          value: "免费",
+          label: "免费",
           FreeType: "",
           editFlag: false
         },
         {
-          value: '年费',
-          label: '年费',
+          value: "年费",
+          label: "年费",
           editFlag: false
         },
         {
-          value: '永久',
-          label: '永久',
+          value: "永久",
+          label: "永久",
           editFlag: false
         }
       ],
@@ -179,79 +197,89 @@ export default {
         { roleName: "消息公告", check: false },
         { roleName: "客户管理", check: false },
         { roleName: "客户权限", check: false },
-        { roleName: "账号管理", check: false },
+        { roleName: "账号管理", check: false }
       ],
-      customerSelectValue: '', //客户类型
+      customerSelectValue: "", //客户类型
       checked: true,
-      customerDialogFormVisible: false,
-    }
+      customerDialogFormVisible: false
+    };
   },
   methods: {
     svaeQuanxian() {
-      if (this.roleId == '' || this.menus == '') {
-        this.$Message.warning('请先选择一个客户并分配权限后再试');
+      if (this.roleId == "" || this.menus == "") {
+        this.$Message.warning("请先选择一个客户并分配权限后再试");
         return;
-      };
+      }
       this.authorization();
     },
-    authorization() { //角色授权 api
+    authorization() {
+      //角色授权 api
       var arr = [];
       this.menus.map(item => {
         if (item.selected) {
-          arr.push(item.id)
-        }
+          arr.push(item.id);
+        };
         if (item.children) {
           item.children.map(list => {
             if (list.selected) {
-              arr.push(list.id)
+              arr.push(list.id);
+            };
+            if(list.children){
+              list.children.map(ele => {
+                if( ele.selected ){
+                  arr.push(ele.id);
+                }
+              });
             }
-          })
+          });
         }
-      })
-      var menuIds = arr.join(",")
+      });
+      var menuIds = arr.join(",");
 
-      this.$http.post(this.api + '/merchantType/typeBindMenu', {
-        mtid: this.roleId,
-        menuIds: menuIds
-      })
+      this.$http
+        .post(this.api + "/merchantType/typeBindMenu", {
+          mtid: this.roleId,
+          menuIds: menuIds
+        })
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             this.$Message.success(res.data.message);
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           // this.$Message.error("请求超时");
-          console.log('请求超时');
-        })
+          console.log("请求超时");
+        });
     },
     handleSelectionChange1() {
       var arr = [];
       this.menus.map((item, index) => {
         arr[index] = item;
-      })
+      });
       this.menus = arr;
     },
     handleSelectionChange2() {
       var arr = [];
       this.menus.map((item, index) => {
         arr[index] = item;
-      })
+      });
       this.menus = arr;
-
     },
-    addCustomer() { //新增客户类型
+    addCustomer() {
+      //新增客户类型
       let new_customerFormData_L = {
         typeName: "", //类型名称
-        typePostage: '', //资费
-        typeDescribe: '', //描述
-        count: '', //限制人数
+        typePostage: "", //资费
+        typeDescribe: "", //描述
+        count: "" //限制人数
       };
       this.customerFormData_L = new_customerFormData_L;
       this.customerDialogFormVisible = true;
     },
-    editBtn(index, row) { //编辑按钮
+    editBtn(index, row) {
+      //编辑按钮
       console.log(row);
       this.customerFormData_L.id = row.id;
       this.customerFormData_L.typeName = row.typeName;
@@ -260,7 +288,8 @@ export default {
       this.customerFormData_L.count = row.count;
       this.customerDialogFormVisible = true;
     },
-    customerDialogFormPushBtn() { //保存
+    customerDialogFormPushBtn() {
+      //保存
       this.customerFormData_L.count = Number(this.customerFormData_L.count);
       console.log(this.customerFormData_L);
       this.saveObject();
@@ -270,9 +299,10 @@ export default {
     roleEdit(row, column, cell, $event) {
       this.customerTabData_R.forEach(item => {
         item.check = true;
-      })
+      });
     },
-    handleSelectionChange(val) { //选中的数据
+    handleSelectionChange(val) {
+      //选中的数据
       this.multipleSelection = val;
       // console.log(val);
     },
@@ -280,77 +310,90 @@ export default {
       // alert(1001);
       return row.check != false;
     },
-    updateObject(id) { //编辑更新客户类型
-      this.$http.post(this.api + '/merchantType/updateObject', this.customerFormData_L)
+    updateObject(id) {
+      //编辑更新客户类型
+      this.$http
+        .post(this.api + "/merchantType/updateObject", this.customerFormData_L)
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             console.log(res);
-            if (res.data.status == '200') {
+            if (res.data.status == "200") {
               console.log(res.data);
               this.queryList();
               this.$Message.success(res.data.message);
-            } else if (res.data.status == '403') {
+            } else if (res.data.status == "403") {
               this.$Message.error(res.data.message);
             }
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-          console.log('请求超时');
-        })
+          console.log("请求超时");
+        });
     },
-    saveObject() { //新增客户类型 api
-      this.$http.post(this.api + '/merchantType/saveObject', this.customerFormData_L)
+    saveObject() {
+      //新增客户类型 api
+      this.$http
+        .post(this.api + "/merchantType/saveObject", this.customerFormData_L)
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             console.log(res.data);
-            if (res.data.status == '200') {
+            if (res.data.status == "200") {
               console.log(res.data);
               this.queryList();
               this.$Message.success(res.data.message);
-            } else if (res.data.status == '403') {
+            } else if (res.data.status == "403") {
               this.$Message.error(res.data.message);
             }
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-          console.log('请求超时');
-        })
+          console.log("请求超时");
+        });
     },
-    queryList() { //查询平台客户类型列表数据
-      this.$http.post(this.api + '/merchantType/queryList', {})
+    queryList() {
+      //查询平台客户类型列表数据
+      this.$http
+        .post(this.api + "/merchantType/queryList", {})
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
+          if (res.status == "200") {
+            if (res.data.status == "200") {
               this.findResourceByMid();
               console.log(res.data);
               this.customerTabData_L = res.data.result;
               this.$Message.success(res.data.message);
             }
-          } else if (res.data.status == '403') {
+          } else if (res.data.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-          console.log('请求超时');
-        })
+          console.log("请求超时");
+        });
     },
-    findResourceByMid() { //查询平台客户权限列表
+    findResourceByMid() {
+      //查询平台客户权限列表
       // this.$http.post(this.api + '/user/findResourceByMid', {
       //   merchantId: this.user.merchants[0].id
       // })
-      this.$http.post(this.api + '/sysMenu/queryList', {})
+      this.$http
+        .post(this.api + "/sysMenu/queryList", {})
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             this.menus = getNodes(res.data.result);
-
+            console.log(this.menus);
             this.menus.forEach(function(ele, index) {
               ele.selected = false;
               if (ele.children) {
                 ele.children.forEach(function(item, index) {
                   item.selected = false;
+                  if (item.children) {
+                    item.children.forEach(list => {
+                      list.selected = false;
+                    });
+                  }
                 });
               }
             });
@@ -358,78 +401,96 @@ export default {
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
-        })
+          this.$Message.error("请求超时");
+        });
     },
 
     settingQx(arr) {
-
       var arrs = [];
-
+      // console.log(this.menus);
       for (let i = 0; i < this.menus.length; i++) {
-
+        //遍历一级菜单
         this.menus[i].selected = false;
+        console.log(this.menus[i]);
         for (let j = 0; j < arr.length; j++) {
           if (this.menus[i].id === arr[j]) {
             this.menus[i].selected = true;
           }
-
         }
         arrs[i] = this.menus[i];
       }
 
-
-
-      this.menus.map((item) => {
-
+      this.menus.map(item => {
+        //遍历二级菜单
         if (item.children) {
-          item.children.map((list) => {
-            arr.map((ele) => {
+          item.children.map(list => {
+            arr.map(ele => {
               if (list.id == ele) {
                 list.selected = true;
               }
-            })
-          })
+            });
+          });
         }
-      })
-
+      });
+      this.menus.map(item => {
+        //遍历三级菜单
+        if (item.children) {
+          item.children.map(list => {
+            if (list.children) {
+              list.children.map(chl => {
+                arr.map(ele => {
+                  if (chl.id == ele) {
+                    chl.selected = true;
+                  }
+                });
+              });
+            }
+          });
+        }
+      });
       this.menus = arrs;
-
-
     },
-    queryMenuByType(row) { //客户类型对应菜单
+    queryMenuByType(row) {
+      //客户类型对应菜单
       this.rowName = row.typeName;
       this.roleId = row.id;
-      this.$http.post(this.api + '/merchantType/queryMenuByType', {
-        mtid: row.id
-      })
+      this.$http
+        .post(this.api + "/merchantType/queryMenuByType", {
+          mtid: row.id
+        })
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             this.menus.forEach(function(ele, index) {
               ele.selected = false;
               if (ele.children) {
                 ele.children.forEach(function(item, index) {
                   item.selected = false;
+                  if (item.children) {
+                    item.children.forEach(list => {
+                      list.selected = false;
+                    });
+                  }
                 });
               }
             });
-            this.settingQx(res.data.result)
+            console.log(res.data.result);
+            this.settingQx(res.data.result);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-        })
+        });
     }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>
 section {
-  >div {
+  > div {
     background: #ffffff;
     padding: 24px;
-    overflow: hidden;
+    // overflow: hidden;
     .searchBox {
       margin-bottom: 10px;
     }
@@ -466,12 +527,12 @@ section {
     .sys_menu_head_2 {
       width: 100%;
       height: 41px;
-      overflow: hidden;
+      // overflow: hidden;
       line-height: 41px;
       box-sizing: border-box;
       border-bottom: 1px solid #dfe6ec;
       // background: #dfe6ec;
-      >div {
+      > div {
         text-align: center;
         box-sizing: border-box;
         border-left: 1px solid #dfe6ec;
@@ -481,11 +542,11 @@ section {
       }
     }
     .saveRoleManger {
-      overflow: hidden;
-      >div:nth-child(1) {
+      // overflow: hidden;
+      > div:nth-child(1) {
         float: left;
       }
-      >button {
+      > button {
         float: right;
       }
     }
