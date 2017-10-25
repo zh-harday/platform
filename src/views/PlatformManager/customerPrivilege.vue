@@ -68,9 +68,10 @@
             </el-table>
           </div>
         </el-col>
+        <!-- right -->
         <el-col :span="16">
-          <div class="grid-content bg-purple">
-            <el-row :gutter="0" class="roleName">
+          <!-- <div class="grid-content bg-purple"> -->
+            <!-- <el-row :gutter="0" class="roleName">
               <el-col :span="15" class="roleName_spanBoder">
                 <div class="grid-content bg-purple-dark">
                   权限名称
@@ -81,11 +82,11 @@
                   操作
                 </div>
               </el-col>
-            </el-row>
+            </el-row> -->
             <!-- 权限列表 Start -->
             <!-- 权限列表 End -->
             <!-- sys menu -->
-            <el-row>
+            <!-- <el-row>
               <el-col :span="24" v-for="(item,index) in menus" :key="item">
                 <el-row class="common sys_menu_head_2">
                   <el-col :span="15">
@@ -111,7 +112,6 @@
                         </el-col>
                       </el-row>
                       <el-row v-for="ele in list.children" :key="ele.id" class="common sys_menu_head_2">
-                        <!-- {{ele}} -->
                         <el-col :span="15">
                           <div class="menuName">{{ele.menuName}}</div>
                         </el-col>
@@ -125,10 +125,62 @@
                 </el-row>
               </el-col>
             </el-row>
-            <!-- sys menu end -->
-          </div>
-        </el-col>
+          </div> -->
+          <el-row>
+                    <el-col>
+                        <div class="limitBtn">
+                            <!--<el-button type="default" size="small">修改权限</el-button>-->
+                            <el-button type="danger" size="small" @click="saveRole" v-if="this.userId">保存</el-button>
+                        </div>
+                    </el-col>
+                    <el-col :span="6">
+                        <div class="left" style="font-weight:bold;background-color: #eef1f6;">权限点</div>
+                    </el-col>
+                    <el-col :span="18">
+                        <div class="f_right">权限</div>
+                    </el-col>
 
+                    <div v-for="item in menus" :key="item">
+                        <el-col :span="24" style="border: 1px solid #dfe6ec;">
+                        <el-col :span="6">
+                            <div class="left">{{item.menuName}}</div>
+                        </el-col>
+                        <el-col :span="18">
+                            <div class="right">
+                                <div v-if="item.children">
+                                    <div :key="nextItem" v-for="nextItem in item.children">
+                                        <div style="flex-direction: row; display: flex">
+                                            <div >{{nextItem.menuName}}</div>
+                                            <div style=" margin-left: 20px">
+                                                <el-checkbox-group v-model="clickMenu" @change="handleCheckedCitiesChange">
+                                                    <el-checkbox :key="ele.id" v-for="(ele, index) in nextItem.buttons" :label="ele.id">{{ele.menuName}}</el-checkbox>
+                                                </el-checkbox-group>
+                                            </div>
+                                            <!-- <div v-if="nextItem.children" style=" margin-left: 20px">
+                                              <div :key="ele" v-for="ele in nextItem.children">
+                                                  <div >{{ele.menuName}}</div>
+                                              </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="item.buttons" style="margin-left: 20px;flex-direction: row; display: flex">
+                                    <el-checkbox-group v-model="clickMenu" @change="a">
+                                        <el-checkbox :key="text.id" v-for="(text, index) in item.buttons" :label="text.id">{{text.menuName}}</el-checkbox>
+                                    </el-checkbox-group>
+                                </div>
+                                <!-- <div v-if="!item.children">
+                                    <el-checkbox-group v-model="clickMenu" @change="a">
+                                        <el-checkbox :key="text" v-for="(text, index) of item.buttons" :label="text.path">{{text.menuName}}</el-checkbox>
+                                    </el-checkbox-group>
+                                </div> -->
+                            </div>
+                        </el-col>
+                        </el-col>
+                    </div>
+                </el-row>
+
+        </el-col>
         <!-- sys menu end -->
       </el-row>
     </div>
@@ -201,7 +253,8 @@ export default {
       ],
       customerSelectValue: "", //客户类型
       checked: true,
-      customerDialogFormVisible: false
+      customerDialogFormVisible: false,
+      clickMenu: []
     };
   },
   methods: {
@@ -214,28 +267,32 @@ export default {
     },
     authorization() {
       //角色授权 api
-      var arr = [];
-      this.menus.map(item => {
-        if (item.selected) {
-          arr.push(item.id);
-        };
-        if (item.children) {
-          item.children.map(list => {
-            if (list.selected) {
-              arr.push(list.id);
-            };
-            if(list.children){
-              list.children.map(ele => {
-                if( ele.selected ){
-                  arr.push(ele.id);
-                }
-              });
-            }
-          });
-        }
-      });
-      var menuIds = arr.join(",");
-
+      // let arr1 = this.clickMenu.splice(0);
+      // this.clickMenu.splice(0);
+      // console.log(arr1);
+      // var arr = [];
+      // this.menus.map(item => {
+        //   if (item.selected) {
+          //     arr.push(item.id);
+      //   }
+      //   if (item.children) {
+        //     item.children.map(list => {
+          //       if (list.selected) {
+            //         arr.push(list.id);
+      //       }
+      //       if (list.children) {
+        //         list.children.map(ele => {
+          //           if (ele.selected) {
+            //             arr.push(ele.id);
+      //           }
+      //         });
+      //       }
+      //     });
+      //   }
+      // });
+      console.log(this.clickMenu);
+      // var menuIds = arr.join(",");
+      var menuIds = this.clickMenu.join(",");
       this.$http
         .post(this.api + "/merchantType/typeBindMenu", {
           mtid: this.roleId,
@@ -382,8 +439,11 @@ export default {
         .post(this.api + "/sysMenu/queryList", {})
         .then(res => {
           if (res.status == "200") {
-            this.menus = getNodes(res.data.result);
-            console.log(this.menus);
+            console.log("///////////////////////");
+            console.log(res.data);
+            // this.menus = getNodes(res.data.result);
+            this.menus = res.data.result;
+            // console.log(this.menus);
             this.menus.forEach(function(ele, index) {
               ele.selected = false;
               if (ele.children) {
@@ -460,21 +520,29 @@ export default {
         })
         .then(res => {
           if (res.status == "200") {
-            this.menus.forEach(function(ele, index) {
-              ele.selected = false;
-              if (ele.children) {
-                ele.children.forEach(function(item, index) {
-                  item.selected = false;
-                  if (item.children) {
-                    item.children.forEach(list => {
-                      list.selected = false;
-                    });
-                  }
-                });
+            // this.menus.forEach(function(ele, index) {
+            //   ele.selected = false;
+            //   if (ele.children) {
+            //     ele.children.forEach(function(item, index) {
+            //       item.selected = false;
+            //       if (item.children) {
+            //         item.children.forEach(list => {
+            //           list.selected = false;
+            //         });
+            //       }
+            //     });
+            //   }
+            // });
+            this.clickMenu = [];
+            res.data.result.forEach((item, index) => {
+              if (this.clickMenu) {
+                this.clickMenu.push(item);
+              } else {
+                this.clickMenu.push(item);
               }
-            });
+            }, this);
             console.log(res.data.result);
-            this.settingQx(res.data.result);
+            // this.settingQx(res.data.result);
           }
         })
         .catch(error => {
@@ -487,6 +555,43 @@ export default {
 
 <style lang="less" scoped>
 section {
+  .roleBtn,
+  .limitBtn {
+    margin-bottom: 15px;
+  }
+  .limitBtn {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .left {
+    /*min-height: ;*/
+    /*height: 40px;*/
+    line-height: 40px;
+    /*border: 1px solid #dfe6ec;*/
+    /*border-bottom: none;*/
+    text-align: center;
+  }
+  .right {
+    display: flex;
+    /*height: 40px;*/
+    min-height: 40px;
+    /*padding: 5px 0;*/
+    line-height: 40px;
+    padding-left: 10px;
+    border-left: 1px solid #dfe6ec;
+    /*border-left: none;*/
+    border-bottom: none;
+  }
+  .f_right {
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid #dfe6ec;
+    border-left: none;
+    border-bottom: none;
+    text-align: center;
+    font-weight: bold;
+    background-color: #eef1f6;
+  }
   > div {
     background: #ffffff;
     padding: 24px;

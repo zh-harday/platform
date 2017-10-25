@@ -43,6 +43,7 @@
                 </el-col>
             </el-row>
             <!-- sys menu -->
+            <!-- 一级菜单 start -->
             <el-row>
                 <el-col :span="24" v-for="(item,index) in menus" :key="item">
                     <el-row class="common sys_menu_head_2">
@@ -73,28 +74,29 @@
                             </div>
                         </el-col>
                     </el-row>
-
+                    <!-- 一级菜单 end -->
+                    <!-- 二级菜单 start -->
                     <el-row class="common sys_menu_head_2">
                         <el-col v-for="list in item.children" :key="list.id" :span="24">
                             <el-row>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{list.menuName}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{list.url}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{list.createDate}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{list.versionRecord}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{list.description}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>
-                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,1)">
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,2)">
                                             <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'parent')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
@@ -104,25 +106,27 @@
                                     </div>
                                 </el-col>
                             </el-row>
+                            <!-- 二级菜单 end -->
+                            <!-- 三级菜单 start -->
                             <el-row v-for="ele in list.children" :key="ele.id" class="common sys_menu_head_2">
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{ele.menuName}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{ele.url}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{ele.createDate}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{ele.versionRecord}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>{{ele.description}}</div>
                                 </el-col>
-                                <el-col :span="4">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
                                     <div>
-                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,1)">
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,3)">
                                             <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'parent')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
@@ -132,6 +136,73 @@
                                     </div>
                                 </el-col>
                             </el-row>
+                            <!-- 三级菜单 end -->
+                            <!-- 三级按钮 start-->
+                                <el-row v-for="ele in list.buttons" :key="ele.id" class="common sys_menu_head_2">
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{ele.menuName}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{ele.url}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{ele.createDate}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{ele.versionRecord}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{ele.description}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,3)">
+                                            <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
+                                        </el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'parent')">
+                                            <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
+                                        </el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="deletMenuA(ele)">
+                                            <Icon size="20" type="trash-a"></Icon>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                            <!-- 三级按钮 end -->
+                        </el-col>
+                    </el-row>
+                    <!-- 二级 Buttons -->
+                    <el-row class="common sys_menu_head_2">
+                        <el-col v-for="list in item.buttons" :key="list.id" :span="24">
+                            <el-row>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{list.menuName}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{list.url}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{list.createDate}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{list.versionRecord}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>{{list.description}}</div>
+                                </el-col>
+                                <el-col :span="4" style="border-right: 1px solid #dfe6ec;">
+                                    <div>
+                                        <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,2)">
+                                            <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'parent')">
+                                            <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
+                                        <el-button style="color:#5c6b77" type="text" @click="deletMenuA(list)">
+                                            <Icon size="20" type="trash-a"></Icon>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                            <!-- 二级按钮 end -->
                         </el-col>
                     </el-row>
                 </el-col>
@@ -141,10 +212,10 @@
                 <el-form :model="addMenusFormData" ref="addMenusFormData" label-position="left">
                     <el-row :gutter="20">
                         <el-col :span="12" style="text-align:center;margin-bottom:20px;">
-                            <el-radio class="radio" v-model="type" label=0>菜单</el-radio>
+                            <el-radio :disabled="isDisableMenu" class="radio" v-model="type" label=0>菜单</el-radio>
                         </el-col>
                         <el-col :span="12" style="text-align:center;margin-bottom:20px;">
-                            <el-radio class="radio" v-model="type" label=1>按钮</el-radio>
+                            <el-radio :disabled="isDisableBtn" class="radio" v-model="type" label=1>按钮</el-radio>
                         </el-col>
                         <el-col :span="12">
                             <div class="grid-content bg-purple-dark">
@@ -190,6 +261,8 @@ export default {
   },
   data() {
     return {
+      isDisableMenu: false,
+      isDisableBtn: false,
       radio: 0,
       type: 0,
       radioBtn: false,
@@ -230,7 +303,7 @@ export default {
         .then(res => {
           if (res.status == "200") {
             console.log(res.data.result);
-            res.data.result.forEach(function(item) {
+            res.data.result.forEach(item => {
               item.createDate = getDate(item.createDate);
               item.versionRecord = getDate(item.versionRecord);
               if (item.children) {
@@ -244,6 +317,39 @@ export default {
                     });
                   }
                 });
+              }
+            });
+            res.data.result.forEach(item => {
+              if (item.buttons) {
+                //一级按钮
+                item.buttons.map(a => {
+                  a.createDate = getDate(a.createDate);
+                  a.versionRecord = getDate(a.versionRecord);
+                });
+                if (item.children) {
+                  //二级菜单
+                  item.children.map(b => {
+                    if (b.buttons) {
+                      //二级按钮
+                      b.buttons.map(c => {
+                        c.createDate = getDate(c.createDate);
+                        c.versionRecord = getDate(c.versionRecord);
+                      });
+                    }
+                    if (b.children) {
+                      //三级菜单
+                      b.children.map(d => {
+                        if (d.buttons) {
+                          //三级按钮
+                          d.buttons.map(e => {
+                            e.createDate = getDate(e.createDate);
+                            e.versionRecord = getDate(e.versionRecord);
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
               }
             });
             // this.menus = getNodes(res.data.result);
@@ -265,11 +371,31 @@ export default {
       console.log(row);
       this.rowMenuID = row; //保存当前行菜单信息
       if (num == 0) {
-          alert()
+        //添加一级
+        this.isDisableMenu = false;
+        this.isDisableBtn = true;
+        this.parentId = "0";
+      } else if (num == 1) {
+        //添加二级
+        this.isDisableMenu = false;
+        this.isDisableBtn = false;
+        // alert(111);
+      } else if (num == 2) {
+        //添加三级
+        this.isDisableMenu = true;
+        this.isDisableBtn = false;
+        // alert(111);
+      } else if (num == 3) {
+        //添加四级(不允许)
+        this.isDisableMenu = true;
+        this.isDisableBtn = true;
+        return;
+      }
+      if (row == 0) {
         this.parentId = "0";
       } else {
         this.parentId = this.rowMenuID.id;
-      };
+      }
       this.isEdit = false;
       let new_addFormData = {
         name: "",
@@ -293,6 +419,8 @@ export default {
         this.parentId = row.parentId;
         // this.parentId = false;
       }
+      this.isDisableMenu = true;
+      this.isDisableBtn = true;
       this.rowMenuID = row;
       this.dialogFormVisible1 = true;
       this.isEdit = true;
@@ -313,6 +441,15 @@ export default {
       item.versionRecord = "";
       item.description = "";
     },
+    checkType() {
+      //检查新增的是菜单还是按钮
+      if (this.type == 0) {
+        this.addMenusFormData.description = "菜单";
+      } else {
+        this.addMenusFormData.description = "按钮";
+      }
+      return this.addMenusFormData.description;
+    },
     deletMenuA(item) {
       //删除一级菜单
       console.log(item);
@@ -329,6 +466,7 @@ export default {
       //send 添加菜单的信息
       console.log(this.addMenusFormData);
       console.log(this.type);
+      this.addMenusFormData.description = this.checkType();
       this.type = Number(this.type);
       if (this.isEdit) {
         this.updateMenu();
@@ -452,7 +590,7 @@ section {
         text-align: center;
         box-sizing: border-box;
         border: 1px solid #dfe6ec;
-        border-right: none;
+        // border-right: none;
         border-bottom: none;
       }
       > div:last-child {
