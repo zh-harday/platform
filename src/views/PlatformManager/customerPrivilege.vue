@@ -127,7 +127,7 @@
             </el-row>
           </div> -->
           <el-row>
-                    <el-col>
+                    <el-col :span="24">
                         <div class="limitBtn">
                             <!--<el-button type="default" size="small">修改权限</el-button>-->
                             <el-button type="danger" size="small" @click="saveRole" v-if="this.userId">保存</el-button>
@@ -141,9 +141,14 @@
                     </el-col>
 
                     <div v-for="item in menus" :key="item">
-                        <el-col :span="24" style="border: 1px solid #dfe6ec;">
+                      <el-col :span="24" style="border: 1px solid #dfe6ec;">
                         <el-col :span="6">
-                            <div class="left">{{item.menuName}}</div>
+                          <div style="margin: 10px">
+                            <el-checkbox-group v-model="clickMenu" @change="handleCheckedCitiesChange">
+                                <el-checkbox :key="item.id" :label="item.id">{{item.menuName}}</el-checkbox>
+                            </el-checkbox-group>
+                          </div>
+                            <!-- <div class="left">{{item.menuName}}</div> -->
                         </el-col>
                         <el-col :span="18">
                             <div class="right">
@@ -565,7 +570,7 @@ export default {
 section {
   .roleBtn,
   .limitBtn {
-    margin-bottom: 15px;
+    // margin-bottom: 15px;
   }
   .limitBtn {
     display: flex;
