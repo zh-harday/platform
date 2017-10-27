@@ -150,7 +150,15 @@
                                 <div v-if="item.children">
                                     <div :key="nextItem" v-for="nextItem in item.children">
                                         <div style="flex-direction: row; display: flex">
-                                            <div >{{nextItem.menuName}}</div>
+                                            <el-checkbox-group v-model="clickMenu" @change="handleCheckedCitiesChange">
+                                                 <el-checkbox :key="nextItem.id" :label="nextItem.id">{{nextItem.menuName}}</el-checkbox>
+                                            </el-checkbox-group>
+                                            <!-- <div >{{nextItem.menuName}}</div> -->
+                                            <!-- <div style=" margin-left: 20px">
+                                                <el-checkbox-group v-model="clickMenu" @change="handleCheckedCitiesChange">
+                                                    <el-checkbox :key="ele.id" v-for="(ele, index) in nextItem.menuName" :label="ele.id">{{nextItem.menuName}}</el-checkbox>
+                                                </el-checkbox-group>
+                                            </div> -->
                                             <div style=" margin-left: 20px">
                                                 <el-checkbox-group v-model="clickMenu" @change="handleCheckedCitiesChange">
                                                     <el-checkbox :key="ele.id" v-for="(ele, index) in nextItem.buttons" :label="ele.id">{{ele.menuName}}</el-checkbox>
@@ -272,18 +280,18 @@ export default {
       // console.log(arr1);
       // var arr = [];
       // this.menus.map(item => {
-        //   if (item.selected) {
-          //     arr.push(item.id);
+      //   if (item.selected) {
+      //     arr.push(item.id);
       //   }
       //   if (item.children) {
-        //     item.children.map(list => {
-          //       if (list.selected) {
-            //         arr.push(list.id);
+      //     item.children.map(list => {
+      //       if (list.selected) {
+      //         arr.push(list.id);
       //       }
       //       if (list.children) {
-        //         list.children.map(ele => {
-          //           if (ele.selected) {
-            //             arr.push(ele.id);
+      //         list.children.map(ele => {
+      //           if (ele.selected) {
+      //             arr.push(ele.id);
       //           }
       //         });
       //       }
