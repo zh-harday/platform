@@ -16,7 +16,7 @@
                     <div>修改日期</div>
                 </el-col>
                 <el-col :span="4">
-                    <div>备注</div>
+                    <div>类型</div>
                 </el-col>
                 <el-col :span="4">
                     <div>操作</div>
@@ -465,8 +465,8 @@ export default {
     },
     saveSysMenu() {
       //send 添加菜单的信息
-    //   console.log(this.addMenusFormData);
-    //   console.log(this.type);
+      //   console.log(this.addMenusFormData);
+      //   console.log(this.type);
       console.log(this.isEdit);
       this.addMenusFormData.description = this.checkType();
       this.type = Number(this.type);
