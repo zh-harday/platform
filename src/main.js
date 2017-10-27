@@ -19,8 +19,8 @@ Vue.use(ElementUI);
 
 Vue.prototype.$http = axios;
 Vue.prototype.md5 = md5;
-// Vue.prototype.api = '/api'; //公司IP请求时 URL
-Vue.prototype.api = 'http://sdwlyxgs.imwork.net:12026'; //外网请求时 URL
+Vue.prototype.api = '/api'; //公司IP请求时 URL
+// Vue.prototype.api = 'http://sdwlyxgs.imwork.net:12026'; //外网请求时 URL
 // Vue.prototype.api = ''; //上线时 URL
 
 var vm = new Vue({

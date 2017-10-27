@@ -98,7 +98,7 @@
                                     <div>
                                         <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,2)">
                                             <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
-                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'parent')">
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'children')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="deletMenuA(list)">
                                             <Icon size="20" type="trash-a"></Icon>
@@ -128,7 +128,7 @@
                                     <div>
                                         <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,3)">
                                             <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
-                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'parent')">
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'children')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="deletMenuA(ele)">
                                             <Icon size="20" type="trash-a"></Icon>
@@ -159,7 +159,7 @@
                                         <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,3)">
                                             <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
                                         </el-button>
-                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'parent')">
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'children')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
                                         </el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="deletMenuA(ele)">
@@ -194,7 +194,7 @@
                                     <div>
                                         <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(list,2)">
                                             <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
-                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'parent')">
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(list,parent,'children')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="deletMenuA(list)">
                                             <Icon size="20" type="trash-a"></Icon>
@@ -397,7 +397,7 @@ export default {
         this.parentId = this.rowMenuID.id;
       }
       this.isEdit = false;
-      let new_addFormData = {
+      let new_addMenusFormData = {
         name: "",
         link: "",
         creatDate: "",
@@ -405,11 +405,12 @@ export default {
         remarks: "",
         editFlag: false
       };
-      this.addFormData = new_addFormData;
+      this.addMenusFormData = new_addMenusFormData;
       this.dialogFormVisible1 = true;
     },
     editMenu(row, parent, type) {
       //编辑
+      this.isEdit = true;
       console.log(row);
       // alert(888);
       if (type == "parent") {
@@ -464,8 +465,9 @@ export default {
     },
     saveSysMenu() {
       //send 添加菜单的信息
-      console.log(this.addMenusFormData);
-      console.log(this.type);
+    //   console.log(this.addMenusFormData);
+    //   console.log(this.type);
+      console.log(this.isEdit);
       this.addMenusFormData.description = this.checkType();
       this.type = Number(this.type);
       if (this.isEdit) {
