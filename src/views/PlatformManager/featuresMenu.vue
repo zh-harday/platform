@@ -159,7 +159,7 @@
                                         <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(ele,3)">
                                             <!-- <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp; -->
                                         </el-button>
-                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'children')">
+                                        <el-button style="color:#5c6b77" type="text" @click="editMenu(ele,parent,'three')">
                                             <Icon size="20" type="compose"></Icon>&nbsp;&nbsp;&nbsp;
                                         </el-button>
                                         <el-button style="color:#5c6b77" type="text" @click="deletMenuA(ele)">
@@ -233,11 +233,17 @@
                         </el-col>
                     </el-row>
                     <el-row :gutter="20">
-                        <el-col :span="24">
+                        <el-col :span="12">
                             <div class="grid-content bg-purple-dark">
                                 <el-form-item label="备注" prop="description" :label-width="addFormLabelWidth">
-                                    <el-input v-model="addMenusFormData.description" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容">
-                                    </el-input>
+                                    <el-input v-model="addMenusFormData.description" auto-complete="off"></el-input>
+                                </el-form-item>
+                            </div>
+                        </el-col>
+                        <el-col :span="12">
+                            <div class="grid-content bg-purple-dark">
+                                <el-form-item label="标识" prop="code" :label-width="addFormLabelWidth">
+                                    <el-input v-model="addMenusFormData.code" auto-complete="off"></el-input>
                                 </el-form-item>
                             </div>
                         </el-col>
@@ -291,6 +297,7 @@ export default {
         creatDate: "", //创建日期,
         versionRecord: "", //修改日期
         description: "", //备注
+        code: "",
         editFlag: false
       }
     };
@@ -403,6 +410,7 @@ export default {
         creatDate: "",
         modifyDate: "",
         remarks: "",
+        code: "",
         editFlag: false
       };
       this.addMenusFormData = new_addMenusFormData;
@@ -419,6 +427,8 @@ export default {
       } else if (type == "children") {
         this.parentId = row.parentId;
         // this.parentId = false;
+      } else if (type == "three") {
+        this.type = 1;
       }
       this.isDisableMenu = true;
       this.isDisableBtn = true;
@@ -466,7 +476,7 @@ export default {
     saveSysMenu() {
       //send 添加菜单的信息
       //   console.log(this.addMenusFormData);
-      //   console.log(this.type);
+      console.log(this.type);
       console.log(this.isEdit);
       this.addMenusFormData.description = this.checkType();
       this.type = Number(this.type);
@@ -481,7 +491,8 @@ export default {
           url: this.addMenusFormData.url,
           description: this.addMenusFormData.description,
           parentId: this.parentId,
-          type: this.type
+          type: this.type,
+          code: this.addMenusFormData.code
           // "icon": this.rowMenuID.icon,
           // "sort": 1,
           // "code": 'sys_menu',
@@ -512,7 +523,8 @@ export default {
           url: this.addMenusFormData.url,
           description: this.addMenusFormData.description,
           parentId: this.parentId,
-          type: this.type
+          type: this.type,
+          code: this.addMenusFormData.code
           // icon: '',
           // sort: 1,
           // code: '',
@@ -598,8 +610,8 @@ section {
       > div:last-child {
         border-right: 1px solid #dfe6ec;
       }
-      .menusBgc{
-          background: #cccccc;
+      .menusBgc {
+        background: #cccccc;
       }
     }
     .menus {
