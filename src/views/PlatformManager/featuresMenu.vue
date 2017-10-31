@@ -47,22 +47,22 @@
             <el-row>
                 <el-col :span="24" v-for="(item,index) in menus" :key="item">
                     <el-row class="common sys_menu_head_2">
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>{{item.menuName}}</div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>{{item.url}}</div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>{{item.createDate}}</div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>{{item.versionRecord}}</div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>{{item.description}}</div>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="4" class="menusBgc">
                             <div>
                                 <el-button style="color:#5c6b77" type="text" @click="addMenuBtn(item,1)">
                                     <Icon size="20" type="plus-round"></Icon>&nbsp;&nbsp;&nbsp;</el-button>
@@ -597,6 +597,9 @@ section {
       }
       > div:last-child {
         border-right: 1px solid #dfe6ec;
+      }
+      .menusBgc{
+          background: #cccccc;
       }
     }
     .menus {
