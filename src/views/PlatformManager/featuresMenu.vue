@@ -235,7 +235,7 @@
                     <el-row :gutter="20">
                         <el-col :span="12">
                             <div class="grid-content bg-purple-dark">
-                                <el-form-item label="备注" prop="description" :label-width="addFormLabelWidth">
+                                <el-form-item label="类型" prop="description" :label-width="addFormLabelWidth">
                                     <el-input v-model="addMenusFormData.description" auto-complete="off"></el-input>
                                 </el-form-item>
                             </div>
@@ -244,6 +244,13 @@
                             <div class="grid-content bg-purple-dark">
                                 <el-form-item label="标识" prop="code" :label-width="addFormLabelWidth">
                                     <el-input v-model="addMenusFormData.code" auto-complete="off"></el-input>
+                                </el-form-item>
+                            </div>
+                        </el-col>
+                        <el-col :span="12">
+                            <div class="grid-content bg-purple-dark">
+                                <el-form-item label="排序" prop="sort" :label-width="addFormLabelWidth">
+                                    <el-input type="number" v-model="addMenusFormData.sort" auto-complete="off"></el-input>
                                 </el-form-item>
                             </div>
                         </el-col>
@@ -298,6 +305,7 @@ export default {
         versionRecord: "", //修改日期
         description: "", //备注
         code: "",
+        sort: '',
         editFlag: false
       }
     };
@@ -411,6 +419,7 @@ export default {
         modifyDate: "",
         remarks: "",
         code: "",
+        sort: "",
         editFlag: false
       };
       this.addMenusFormData = new_addMenusFormData;
@@ -475,16 +484,17 @@ export default {
     },
     saveSysMenu() {
       //send 添加菜单的信息
-      //   console.log(this.addMenusFormData);
+      //console.log(this.addMenusFormData);
       console.log(this.type);
       console.log(this.isEdit);
       this.addMenusFormData.description = this.checkType();
       this.type = Number(this.type);
+      this.addMenusFormData.sort = Number(this.addMenusFormData.sort);
       if (this.isEdit) {
         this.updateMenu();
         this.dialogFormVisible1 = false;
         return;
-      }
+      };
       this.$http
         .post(this.api + "/sysMenu/save", {
           menuName: this.addMenusFormData.menuName,
@@ -492,9 +502,9 @@ export default {
           description: this.addMenusFormData.description,
           parentId: this.parentId,
           type: this.type,
-          code: this.addMenusFormData.code
+          code: this.addMenusFormData.code,
+          sort: this.addMenusFormData.sort
           // "icon": this.rowMenuID.icon,
-          // "sort": 1,
           // "code": 'sys_menu',
         })
         .then(res => {
@@ -524,7 +534,8 @@ export default {
           description: this.addMenusFormData.description,
           parentId: this.parentId,
           type: this.type,
-          code: this.addMenusFormData.code
+          code: this.addMenusFormData.code,
+          sort: this.addMenusFormData.sort
           // icon: '',
           // sort: 1,
           // code: '',
