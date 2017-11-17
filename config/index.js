@@ -33,7 +33,7 @@ module.exports = {
                 // target:'http://192.168.0.104:9092',
                 // target: 'http://18f46963j4.iok.la',
                 // target:'http://192.168.0.135:9092',// 文军凡IP
-                // target:'http://192.168.0.107:9092',// 蔡永亮 IP
+                // target:'http://192.168.0.106:9092',// 蔡永亮 IP
                 // target:'http://100.64.33.181:9091',
                 // target:'http://zhqwjmw.eicp.net',
                 changeOrigin:true,

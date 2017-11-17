@@ -234,7 +234,7 @@
                     </el-row>
                     <el-row :gutter="20">
                         <el-col :span="12">
-                            <div class="grid-content bg-purple-dark">
+                                             <div class="grid-content bg-purple-dark">
                                 <el-form-item label="类型" prop="description" :label-width="addFormLabelWidth">
                                     <el-input v-model="addMenusFormData.description" auto-complete="off"></el-input>
                                 </el-form-item>
@@ -305,7 +305,7 @@ export default {
         versionRecord: "", //修改日期
         description: "", //备注
         code: "",
-        sort: '',
+        sort: "",
         editFlag: false
       }
     };
@@ -438,7 +438,7 @@ export default {
         // this.parentId = false;
       } else if (type == "three") {
         this.type = 1;
-      }
+      };
       this.isDisableMenu = true;
       this.isDisableBtn = true;
       this.rowMenuID = row;
@@ -447,6 +447,7 @@ export default {
       this.addMenusFormData.menuName = row.menuName;
       this.addMenusFormData.url = row.url;
       this.addMenusFormData.description = row.description;
+      this.addMenusFormData.sort = row.sort;
       row.editFlag = !row.editFlag;
     },
     deletMenu(item) {
@@ -494,7 +495,7 @@ export default {
         this.updateMenu();
         this.dialogFormVisible1 = false;
         return;
-      };
+      }
       this.$http
         .post(this.api + "/sysMenu/save", {
           menuName: this.addMenusFormData.menuName,

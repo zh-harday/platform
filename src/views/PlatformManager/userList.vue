@@ -38,7 +38,7 @@
       </div>
       <!-- Add userListFormData Diglog  -->
       <el-dialog title="添加人员" :visible.sync="userListDialogFormVisible">
-        <el-form label-position="left" :model="userListFormData" ref="userListFormData" class="userListFormData">
+        <el-form label-position="left" :rules="rules1" :model="userListFormData" ref="userListFormData" class="userListFormData">
           <div class="inforBackg">基本信息</div>
           <el-row :gutter="20">
             <el-col :span="12">
@@ -159,113 +159,157 @@
 
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 export default {
   computed: {
     userId(state) {
       // alert(333);
-      this.$store.state.login.merchants = JSON.parse(sessionStorage.getItem('merchants')) || {};
-      this.$store.state.login.userInfor = JSON.parse(sessionStorage.getItem('userInfor')) || {};
+      this.$store.state.login.merchants =
+        JSON.parse(sessionStorage.getItem("merchants")) || {};
+      this.$store.state.login.userInfor =
+        JSON.parse(sessionStorage.getItem("userInfor")) || {};
       return {
         userInfor: this.$store.state.login.userInfor,
         merchants: this.$store.state.login.merchants
-      }
-    },
+      };
+    }
   },
   created() {
     console.log(this.userId.merchants[0].id);
     console.log(this.userId.userInfor.name);
-    this.queryRoleListByUM('');
-    if (this.status == '所有' || this.status == '') {
+    this.queryRoleListByUM("");
+    if (this.status == "所有" || this.status == "") {
       this.locked == false;
-    };
+    }
   },
   data() {
+    var validatePhone = (rule, value, callback) => {
+      var pattern = /^1[34578][0-9]{9}$/;
+      if (pattern.test(value) && value != "") {
+        return callback();
+      } else {
+        return callback(new Error("请输入合法的手机号码"));
+      }
+    };
+    var validateEmail = (rule, value, callback) => {
+      var pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+      if (pattern.test(value) && value != "") {
+        return callback();
+      } else {
+        return callback(new Error("请输入合法的邮箱地址"));
+      }
+    };
     return {
+      rules1: {
+        number: [{ validator: validatePhone, trigger: "blur" }],
+        name: [
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          { min: 1, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+        ],
+        roleName: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
+        six: [{ required: true, message: "请输入性别", trigger: "blur" }],
+        birthday: [{ required: true, message: "请输入生日", trigger: "blur" }],
+        phone: [{ validator: validatePhone, trigger: "blur" }],
+        emil: [{ validator: validateEmail, trigger: "blur" }]
+      },
       add: false,
       roleList: [],
       userInfor: {}, //用户信息
-      merchantId: '', //企业id
+      merchantId: "", //企业id
       locked: false, //是否锁定
       isDisabled: false, //是否禁用按钮
-      status: '所有',
-      types: '所有',
-      options: [{
-        value: '',
-        label: '所有'
-      }, {
-        value: '1',
-        label: '启用'
-      }, {
-        value: '0',
-        label: '锁定'
-      }],
+      status: "所有",
+      types: "所有",
+      options: [
+        {
+          value: "",
+          label: "所有"
+        },
+        {
+          value: "1",
+          label: "启用"
+        },
+        {
+          value: "0",
+          label: "锁定"
+        }
+      ],
       userListTabData: [], //用户信息列表
-      userListFormData: { //添加用户信息 form list
+      userListFormData: {
+        //添加用户信息 form list
         name: "", //姓名
         number: "", //账号
         emil: "", //邮箱
         six: "", //性别
         birthday: "", //生日
         phone: "", //手机
-        roleIds: '',
+        roleIds: "",
         roleName: [], //角色id
-        id: '', //用户 id
-        umId: '', //用户商户中间表id
-        pass: '123456', //用户密码
+        id: "", //用户 id
+        umId: "", //用户商户中间表id
+        pass: "123456" //用户密码
       },
       userListDialogFormVisible: false, //Diglog
-      roleSelect: [{ //角色 selectList
-        value: '黄金糕',
-        label: '黄金糕'
-      }, {
-        value: '双皮奶',
-        label: '双皮奶'
-      }, {
-        value: '蚵仔煎',
-        label: '蚵仔煎'
-      }, {
-        value: '龙须面',
-        label: '龙须面'
-      }, {
-        value: '北京烤鸭',
-        label: '北京烤鸭'
-      }],
-      role: '',
-      gender: '',
-      six: [ //性别
+      roleSelect: [
         {
-          value: '1',
-          label: '男'
+          //角色 selectList
+          value: "黄金糕",
+          label: "黄金糕"
         },
         {
-          value: '0',
-          label: '女'
+          value: "双皮奶",
+          label: "双皮奶"
         },
+        {
+          value: "蚵仔煎",
+          label: "蚵仔煎"
+        },
+        {
+          value: "龙须面",
+          label: "龙须面"
+        },
+        {
+          value: "北京烤鸭",
+          label: "北京烤鸭"
+        }
       ],
-      formLabelWidth: '120px',
-      formSelectLabelWidth: 200,
-    }
+      role: "",
+      gender: "",
+      six: [
+        //性别
+        {
+          value: "1",
+          label: "男"
+        },
+        {
+          value: "0",
+          label: "女"
+        }
+      ],
+      formLabelWidth: "120px",
+      formSelectLabelWidth: 200
+    };
   },
   methods: {
     handleIconClick() {
-      this.queryRoleListByUM('', this.input2);
+      this.queryRoleListByUM("", this.input2);
     },
     selectValue(value) {
       console.log(value);
       this.queryRoleListByUM(value);
-      if (value == '') {
-        this.types = '所有';
+      if (value == "") {
+        this.types = "所有";
         this.locked == false;
-      } else if (value == '1') {
-        this.types = '启用';
+      } else if (value == "1") {
+        this.types = "启用";
         this.locked == false;
-      } else if (value == '0') {
-        this.types = '锁定';
+      } else if (value == "0") {
+        this.types = "锁定";
         this.locked == true;
       }
     },
-    addTabBtn() { //添加
+    addTabBtn() {
+      //添加
       // alert(1);
       this.add = true;
       let new_userListFormData = {
@@ -275,37 +319,42 @@ export default {
         six: "", //性别
         birthday: "", //生日
         phone: "", //手机
-        roleIds: '',
-        id: '', //用户 id
-        umId: '', //用户商户中间表id
-        pass: '123456', //用户密码
+        roleIds: "",
+        id: "", //用户 id
+        umId: "", //用户商户中间表id
+        pass: "123456", //用户密码
         roleName: [] //角色名称
       };
       this.roleList = [];
       this.userListFormData = new_userListFormData;
-      this.queryUserListByUM(1, ''); //查询企业角色列表
+      this.queryUserListByUM(1, ""); //查询企业角色列表
       this.userListDialogFormVisible = true;
     },
-    editSaveUserListBtn() { //确定
+    editSaveUserListBtn() {
+      //确定
       if (this.add) {
-        this.userListFormData.roleName = this.userListFormData.roleName.join(',');
+        this.userListFormData.roleName = this.userListFormData.roleName.join(
+          ","
+        );
         console.log(this.userListFormData);
         this.saveUser();
       } else {
         // alert('bj');
 
         for (let item in this.userListFormData) {
-          if (this.userListFormData.six == '女') {
-            this.userListFormData.six = '0';
+          if (this.userListFormData.six == "女") {
+            this.userListFormData.six = "0";
           } else {
-            this.userListFormData.six = '1';
+            this.userListFormData.six = "1";
           }
-        };
-        this.userListFormData.roleName = this.userListFormData.roleName.join(",");
+        }
+        this.userListFormData.roleName = this.userListFormData.roleName.join(
+          ","
+        );
         // console.log(this.userListFormData.roleName);
         this.updateUser();
         console.log(this.userListFormData);
-      };
+      }
       // this.updateUser();
       // this.userListFormData = {};
       this.userListDialogFormVisible = false;
@@ -317,7 +366,8 @@ export default {
     getDateValue(value) {
       this.userListFormData.birthday = value;
     },
-    editUserListTabData(index, row) { //编辑
+    editUserListTabData(index, row) {
+      //编辑
       console.log(row);
       this.add = false;
       this.userListDialogFormVisible = true;
@@ -327,116 +377,128 @@ export default {
     // saveUserListTabData(index, row) { //保存
     //   row.editFlag = false;
     // },
-    checkLocking(index, row) { //锁定
+    checkLocking(index, row) {
+      //锁定
       this.locked = !this.locked;
       console.log(this.locked);
-      if (this.locked) { //锁定
+      if (this.locked) {
+        //锁定
         this.lockUnlock(0);
-      } else { //启用
+      } else {
+        //启用
         this.lockUnlock(1);
       }
     },
-    lockUnlock(num) { //启用/锁定用户
-      this.$http.post(this.api + '/user/lockUnlock', {
-        "umid": this.userId.merchants[0].um_id,
-        "lockValue": num
-      })
+    lockUnlock(num) {
+      //启用/锁定用户
+      this.$http
+        .post(this.api + "/user/lockUnlock", {
+          umid: this.userId.merchants[0].um_id,
+          lockValue: num
+        })
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
+          if (res.status == "200") {
+            if (res.data.status == "200") {
               console.log(res.data);
               this.queryUserListByUM();
               this.$Message.success(res.data.message);
             }
-
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
           // console.log('请求超时');
-        })
+        });
     },
-    queryUserListByUM(id, umid) { //查询企业角色列表 api
-      if (id == '1') {
+    queryUserListByUM(id, umid) {
+      //查询企业角色列表 api
+      if (id == "1") {
         id = this.userId.merchants[0].id;
-      };
-      this.$http.post(this.api + '/role/queryRoleList', {
-        // merchantId: id
-        merchantId: this.userId.merchants[0].id
-      })
+      }
+      this.$http
+        .post(this.api + "/role/queryRoleList", {
+          // merchantId: id
+          merchantId: this.userId.merchants[0].id
+        })
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
+          if (res.status == "200") {
+            if (res.data.status == "200") {
               this.roleList = res.data.result;
               if (umid) {
                 // alert('umid');
                 this.queryUserRoleList(umid); //查询用户拥有角色列表
-              };
-              console.log('企业角色列表');
+              }
+              console.log("企业角色列表");
               console.log(res.data);
               this.$Message.success(res.data.message);
             }
-          } else if (res.data.status == '403') {
+          } else if (res.data.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
-        })
+          this.$Message.error("请求超时");
+        });
     },
-    queryUserRoleList(umid) { //查询用户拥有角色列表 api
-      this.$http.post(this.api + '/role/queryRoleListByUM', {
-        umid: umid //企业用户中间表id
-      })
+    queryUserRoleList(umid) {
+      //查询用户拥有角色列表 api
+      this.$http
+        .post(this.api + "/role/queryRoleListByUM", {
+          umid: umid //企业用户中间表id
+        })
         .then(res => {
-          if (res.status == '200') {
-            console.log('用户角色列表');
+          if (res.status == "200") {
+            console.log("用户角色列表");
             console.log(res.data.result);
             for (let userRoleList in res.data.result) {
               this.roleList.push(res.data.result[userRoleList]);
               console.log(userRoleList);
-            };
-            console.log('合并后数组');
+            }
+            console.log("合并后数组");
             console.log(this.roleList);
             this.$Message.success(res.data.message);
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
-        })
+          this.$Message.error("请求超时");
+        });
     },
-    queryRoleListByUM(num, name) { //查询平台所有用户列表 api
-      this.$http.post(this.api + '/user/queryUserByMid', {
-        "merchantId": this.userId.merchants[0].id,
-        "userName": name,
-        "lockValue": num,
-      })
+    queryRoleListByUM(num, name) {
+      //查询平台所有用户列表 api
+      this.$http
+        .post(this.api + "/user/queryUserByMid", {
+          merchantId: this.userId.merchants[0].id,
+          userName: name,
+          lockValue: num
+        })
         .then(res => {
-          if (res.status == '200') {
+          if (res.status == "200") {
             console.log(res.data);
             this.userListTabData = res.data.result;
             this.$Message.success(res.data.message);
-          } else if (res.data.status == '403') {
+          } else if (res.data.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
-          this.$Message.error('请求超时');
-        })
+          this.$Message.error("请求超时");
+        });
     },
-    queryUser(id) { //查询用户详情列表数据 api
-      this.$http.post(this.api + '/user/queryUser', {
-        "userId": id,
-        "merchantId": this.userId.merchants[0].id
-      })
+    queryUser(id) {
+      //查询用户详情列表数据 api
+      this.$http
+        .post(this.api + "/user/queryUser", {
+          userId: id,
+          merchantId: this.userId.merchants[0].id
+        })
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
-              console.log('用户详情');
+          if (res.status == "200") {
+            if (res.data.status == "200") {
+              console.log("用户详情");
               console.log(res.data);
               this.userListFormData.roleName = [];
               res.data.result.roleList.forEach(item => {
@@ -449,13 +511,13 @@ export default {
               });
 
               for (let item in res.data.result) {
-                if (res.data.result.six == '0') {
-                  res.data.result.six = '女';
+                if (res.data.result.six == "0") {
+                  res.data.result.six = "女";
                 } else {
-                  res.data.result.six = '男';
+                  res.data.result.six = "男";
                 }
                 // this.userListFormData.pass = this.md5(res.data.result.pass, 32);
-              };
+              }
               // this.roleList = res.data.result.roleList;
               this.userListFormData.id = res.data.result.id;
               this.userListFormData.umId = res.data.result.umId;
@@ -468,81 +530,83 @@ export default {
               this.userListFormData.emil = res.data.result.emil;
               this.$Message.success(res.data.message);
             }
-
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-          console.log('请求超时');
-        })
+          console.log("请求超时");
+        });
     },
-    updateUser() { //编辑保存用户信息
-      this.$http.post(this.api + '/user/updateUser', {
-        "id": this.userListFormData.id,
-        "umId": this.userListFormData.umId,
-        "name": this.userListFormData.name,
-        "number": this.userListFormData.number,
-        "pass": '123456',
-        "birthday": this.userListFormData.birthday,
-        "six": this.userListFormData.six,
-        "phone": this.userListFormData.phone,
-        "emil": this.userListFormData.emil,
-        "roleIds": this.userListFormData.roleName
-      })
+    updateUser() {
+      //编辑保存用户信息
+      this.$http
+        .post(this.api + "/user/updateUser", {
+          id: this.userListFormData.id,
+          umId: this.userListFormData.umId,
+          name: this.userListFormData.name,
+          number: this.userListFormData.number,
+          pass: "123456",
+          birthday: this.userListFormData.birthday,
+          six: this.userListFormData.six,
+          phone: this.userListFormData.phone,
+          emil: this.userListFormData.emil,
+          roleIds: this.userListFormData.roleName
+        })
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
+          if (res.status == "200") {
+            if (res.data.status == "200") {
               console.log(res.data);
-              this.queryRoleListByUM('');
+              this.queryRoleListByUM("");
               this.$Message.success(res.data.message);
             }
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-        })
+        });
     },
-    saveUser() { //保存新增用户信息
-      this.$http.post(this.api + '/user/saveUser', {
-        "mId": this.userId.merchants[0].id,
-        "name": this.userListFormData.name,
-        "number": this.userListFormData.number,
-        "pass": "123456",
-        "birthday": this.userListFormData.birthday,
-        "six": this.userListFormData.six,
-        "phone": this.userListFormData.phone,
-        "emil": this.userListFormData.emil,
-        "roleIds": this.userListFormData.roleName
-        // "roleIds": "1d1a3965cd4b499881bede7f4ea94a25,3655c5a1b2bf4f6cac7b31119e74dcac,5b491d3a1a4d4ea6ae6c853b13796d55"
-      })
+    saveUser() {
+      //保存新增用户信息
+      this.$http
+        .post(this.api + "/user/saveUser", {
+          mId: this.userId.merchants[0].id,
+          name: this.userListFormData.name,
+          number: this.userListFormData.number,
+          pass: "123456",
+          birthday: this.userListFormData.birthday,
+          six: this.userListFormData.six,
+          phone: this.userListFormData.phone,
+          emil: this.userListFormData.emil,
+          roleIds: this.userListFormData.roleName
+          // "roleIds": "1d1a3965cd4b499881bede7f4ea94a25,3655c5a1b2bf4f6cac7b31119e74dcac,5b491d3a1a4d4ea6ae6c853b13796d55"
+        })
         .then(res => {
-          if (res.status == '200') {
-            if (res.data.status == '200') {
+          if (res.status == "200") {
+            if (res.data.status == "200") {
               // alert(666);
               console.log(res.data);
-              this.queryRoleListByUM('');
+              this.queryRoleListByUM("");
               this.$Message.success(res.data.message);
             }
-
-          } else if (res.status == '403') {
+          } else if (res.status == "403") {
             this.$Message.error(res.data.message);
           }
         })
         .catch(error => {
           this.$Message.error("请求超时");
-        })
-    },
+        });
+    }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>
 section {
-  >div {
+  > div {
     padding: 24px;
     background: #ffffff;
     overflow: hidden;
