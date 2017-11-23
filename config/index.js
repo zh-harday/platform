@@ -29,8 +29,8 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                target:'http://192.168.0.198:9092',//平台
-                // target:'http://192.168.0.104:9092',
+                // target:'http://192.168.0.198:9092',//平台
+                target:'http://192.168.0.118:9092',
                 // target: 'http://18f46963j4.iok.la',
                 // target:'http://192.168.0.135:9092',// 文军凡IP
                 // target:'http://192.168.0.106:9092',// 蔡永亮 IP

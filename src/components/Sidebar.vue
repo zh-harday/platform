@@ -27,6 +27,7 @@
                     <el-menu-item index="customerPrivilege" @click="addTab(title32, '/home/customerPrivilege', 'customerPrivilege')">{{title32}}</el-menu-item>
                     <el-menu-item index="leadAssistant" @click="addTab(title33, '/home/leadAssistant', 'leadAssistant')">{{title33}}</el-menu-item>
                     <el-menu-item index="memberManagement" @click="addTab(title34, '/home/memberManagement', 'memberManagement')">{{title34}}</el-menu-item>
+                    <el-menu-item index="ParameterConfiguration" @click="addTab(title35, '/home/ParameterConfiguration', 'ParameterConfiguration')">{{title35}}</el-menu-item>
                 </el-submenu>
             </el-menu>
         </div>
@@ -62,7 +63,6 @@ export default {
     },
     data() {
         return {
-
             theModel: [],
             title_09: '平台管理',
             title27: '功能菜单',
@@ -73,7 +73,7 @@ export default {
             title32: '客户权限',
             title33: '云项目',
             title34: '会员管理',
-
+            title35: '参数配置',
         }
     },
     methods: {

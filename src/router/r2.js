@@ -44,5 +44,10 @@ const r2 = [
         name: 'memberManagement',
         component: resolve => require(['../views/PlatformManager/memberManagement.vue'], resolve)
     },
+    {
+        path: 'ParameterConfiguration', //home/平台管理/客户权限
+        name: 'ParameterConfiguration',
+        component: resolve => require(['../views/PlatformManager/ParameterConfiguration.vue'], resolve)
+    },
 ]
 export default r2
